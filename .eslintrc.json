@@ -1,0 +1,20 @@
+{
+  "extends": [
+    "@react-native-community",
+    "plugin:react/jsx-runtime"
+  ],
+  "ignorePatterns": [
+    ".*.js",
+    ".*.ts",
+    "node_modules/",
+    "lib/",
+    "example/"
+  ],
+  "rules": {
+    "endOfLine": 0,
+    "curly": [
+      "error",
+      "multi"
+    ]
+  }
+}

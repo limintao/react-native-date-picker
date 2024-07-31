@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "React Native Dates Picker",
+    "slug": "react-native-date-picker-example",
+    "description": "Customizable React Native DateTime Picker component for Android, iOS, and Web. It includes date, time, and datetime modes and supports different locales.",
+    "version": "1.0.0",
+    "githubUrl": "https://github.com/limintao/react-native-date-picker",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "favicon": "./assets/calendar.png",
+      "themeColor": "#FFFFFF",
+      "display": "fullscreen"
+    }
+  }
+}
