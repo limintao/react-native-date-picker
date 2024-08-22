@@ -164,7 +164,7 @@ const DaySelector = () => {
           </View>
         ))}
       </View>
-      <View style={styles.daysContainer}>
+      <View style={[styles.daysContainer, theme.daysPanelStyle]}>
         {daysGrid?.map((day, index) => {
           return day ? (
             <Day
@@ -218,6 +218,7 @@ const styles = StyleSheet.create({
     height: '100%',
     flexWrap: 'wrap',
     flexDirection: 'row',
+    paddingHorizontal: 10,
     alignContent: 'flex-start',
   },
 });

@@ -33,6 +33,7 @@ export type CalendarThemeProps = {
   headerButtonStyle?: ViewStyle;
   headerButtonColor?: string;
   headerButtonSize?: number;
+  daysPanelStyle?: ViewStyle;
   dayContainerStyle?: ViewStyle;
   todayContainerStyle?: ViewStyle;
   todayTextStyle?: TextStyle;

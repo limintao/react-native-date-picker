@@ -6,6 +6,8 @@
 
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/limintao/react-native-date-picker/blob/main/LICENSE)
+[![npm version](https://img.shields.io/npm/v/eact-native-date-picker.svg?style=flat)](https://www.npmjs.com/package/eact-native-date-picker)
+[![npm](https://img.shields.io/npm/dt/eact-native-date-picker.svg)](https://www.npmjs.com/package/eact-native-date-picker)
 
 React Native 的 DateTimePicker 组件，允许你创建一个可自定义的日期和时间选择器。该组件使用 [Day.js](https://day.js.org/) 库，并包含一组样式属性，使你可以根据自己的 UI 设计更改日历的每一项。
 
@@ -134,7 +136,8 @@ const styles = StyleSheet.create({
 | headerButtonsPosition        | `string`                       | `'around'`  | 定义日历头部“上一个和下一个按钮”的位置 `['around', 'right', 'left']` |
 | buttonPrevIcon               | `ReactNode`                    | `undefined` | 定义日历头部“上一个按钮”的自定义图标                                 |
 | buttonNextIcon               | `ReactNode`                    | `undefined` | 定义日历头部“下一个按钮”的自定义图标                                 |
-| dayContainerStyle            | `ViewStyle`                    | `null`      | 定义日期容器的样式                                                |
+| daysPanelStyle               | `ViewStyle`                    | `null`      | 定义日期选择面板的样式                                             |
+| dayContainerStyle            | `ViewStyle`                    | `null`      | 定义每个日期的容器样式                                             |
 | todayContainerStyle          | `ViewStyle`                    | `null`      | 定义“今天”容器的样式                                              |
 | todayTextStyle               | `TextStyle`                    | `null`      | 定义“今天”文本的样式                                              |
 | monthContainerStyle          | `ViewStyle`                    | `null`      | 定义月份容器的样式                                                |

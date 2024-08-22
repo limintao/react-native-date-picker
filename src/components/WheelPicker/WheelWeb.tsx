@@ -1,3 +1,4 @@
+import { memo, useMemo, useRef } from 'react';
 import {
   Animated,
   PanResponder,
@@ -5,7 +6,6 @@ import {
   View,
   Platform,
 } from 'react-native';
-import { memo, useMemo, useRef } from 'react';
 import { useCalendarContext } from '../../CalendarContext';
 import { sin } from './AnimatedMath';
 import { CALENDAR_HEIGHT } from '../../enums';
