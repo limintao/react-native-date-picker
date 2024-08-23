@@ -1,4 +1,4 @@
-import { memo, useMemo, useRef } from 'react';
+import React, { memo, useMemo, useRef } from 'react';
 import {
   Animated,
   PanResponder,

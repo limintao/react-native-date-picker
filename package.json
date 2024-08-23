@@ -1,6 +1,6 @@
 {
   "name": "react-native-dates-picker",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Customizable date picker for React Native",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",

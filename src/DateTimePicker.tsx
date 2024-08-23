@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useReducer } from 'react';
+import React, { memo, useCallback, useEffect, useReducer } from 'react';
 import {
   getFormatted,
   getDate,
@@ -267,8 +267,8 @@ const DateTimePicker = (
   const onSelectMonth = useCallback(
     (month: number) => {
       let newDate = getDate(state.currentDate).month(month);
-      if (newDate.isAfter(maxDate)) newDate = getDate(maxDate);
-      if (newDate.isBefore(minDate)) newDate = getDate(minDate);
+      if (maxDate && newDate.isAfter(maxDate)) newDate = getDate(maxDate);
+      if (minDate && newDate.isBefore(minDate)) newDate = getDate(minDate);
       dispatch({
         type: CalendarActionKind.CHANGE_CURRENT_DATE,
         payload: getFormatted(newDate),
@@ -284,8 +284,8 @@ const DateTimePicker = (
   const onSelectYear = useCallback(
     (year: number) => {
       let newDate = getDate(state.currentDate).year(year);
-      if (newDate.isAfter(maxDate)) newDate = getDate(maxDate);
-      if (newDate.isBefore(minDate)) newDate = getDate(minDate);
+      if (maxDate && newDate.isAfter(maxDate)) newDate = getDate(maxDate);
+      if (minDate && newDate.isBefore(minDate)) newDate = getDate(minDate);
       dispatch({
         type: CalendarActionKind.CHANGE_CURRENT_DATE,
         payload: getFormatted(newDate),

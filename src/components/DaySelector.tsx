@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import dayjs from 'dayjs';
 import { useCalendarContext } from '../CalendarContext';

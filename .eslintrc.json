@@ -1,7 +1,6 @@
 {
   "extends": [
-    "@react-native-community",
-    "plugin:react/jsx-runtime"
+    "@react-native-community"
   ],
   "ignorePatterns": [
     ".*.js",

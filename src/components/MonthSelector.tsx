@@ -1,3 +1,4 @@
+import React from 'react';
 import { Text, View, Pressable, StyleSheet } from 'react-native';
 import { useCalendarContext } from '../CalendarContext';
 import { getParsedDate, getMonths } from '../utils';

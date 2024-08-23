@@ -1,4 +1,4 @@
-import { ReactNode, memo } from 'react';
+import React, { ReactNode, memo } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useCalendarContext } from '../CalendarContext';
 import type { CalendarViews } from '../enums';
