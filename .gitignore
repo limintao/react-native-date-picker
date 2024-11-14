@@ -71,3 +71,10 @@ lib/
 
 .env
 web-build
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+example/.yarn/*

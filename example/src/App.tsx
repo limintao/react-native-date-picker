@@ -214,11 +214,11 @@ export default function App() {
               dates={dates}
               displayFullDays
               timePicker={timePicker}
-              // minDate={dayjs().startOf('second')}
-              // maxDate={dayjs().add(4, 'day').endOf('second')}
+              // minDate={range.startDate}
+              // maxDate={new Date()}
               //firstDayOfWeek={1}
               // columns={['year', 'month', 'day', 'hour', 'minute', 'second']}
-              onChange={onChange}
+              // onChange={onChange}
               headerButtonColor={theme?.mainColor}
               selectedItemColor={theme?.mainColor}
               // eslint-disable-next-line react-native/no-inline-styles

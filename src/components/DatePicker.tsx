@@ -14,7 +14,7 @@ import {
 function createNumberList(start: number, end: number) {
   return new Array(end - start)
     .fill(0)
-    .map((_, index) => String(index + start).padStart(2, '0'));
+    .map((_, index) => String(index + 1 + start).padStart(2, '0'));
 }
 
 const DatePicker = () => {
@@ -41,15 +41,16 @@ const DatePicker = () => {
 
   const { year: startYear, month: startMonth } = getParsedDate(minDate);
   const { year: endYear, month: endMonth } = getParsedDate(maxDate);
-  const years = createNumberList(startYear, endYear + 1);
+  const years = createNumberList(startYear, endYear);
   const months = useMemo(
     () =>
       createNumberList(
-        startYear === year ? startMonth + 1 : 1,
-        endYear === year ? endMonth + 2 : 12
+        startYear === year ? startMonth : 0,
+        endYear === year ? endMonth + 1 : 12
       ),
     [endMonth, endYear, startMonth, startYear, year]
   );
+
   const days = useMemo(
     () => getDaysNumInMonth(year, month + 1, minDate, maxDate),
     [year, month, minDate, maxDate]

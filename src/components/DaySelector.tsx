@@ -117,7 +117,7 @@ const DaySelector = () => {
               if (inRange && !leftCrop && !rightCrop) isSelected = false;
             }
           } else if (mode === 'single')
-            isSelected = areDatesOnSameDay(day.date, date);
+            isSelected = areDatesOnSameDay(day.date, currentDate);
 
           return {
             ...day,
@@ -143,6 +143,7 @@ const DaySelector = () => {
       startDate,
       endDate,
       dates,
+      currentDate,
     ]
   );
 
@@ -165,8 +166,8 @@ const DaySelector = () => {
         ))}
       </View>
       <View style={[styles.daysContainer, theme.daysPanelStyle]}>
-        {daysGrid?.map((day, index) => {
-          return day ? (
+        {daysGrid?.map((day, index) =>
+          day ? (
             <Day
               key={index}
               date={day.date}
@@ -184,8 +185,8 @@ const DaySelector = () => {
             />
           ) : (
             <EmptyDay key={index} height={height} />
-          );
-        })}
+          )
+        )}
       </View>
     </View>
   );

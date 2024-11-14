@@ -5,9 +5,9 @@
 # react-native-date-picker
 
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
-[![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/limintao/react-native-date-picker/blob/main/LICENSE)
-[![npm version](https://img.shields.io/npm/v/eact-native-date-picker.svg?style=flat)](https://www.npmjs.com/package/eact-native-date-picker)
-[![npm](https://img.shields.io/npm/dt/eact-native-date-picker.svg)](https://www.npmjs.com/package/eact-native-date-picker)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/limintao/react-native-dates-picker/blob/main/LICENSE)
+[![npm version](https://img.shields.io/npm/v/react-native-dates-picker.svg?style=flat)](https://www.npmjs.com/package/react-native-dates-picker)
+[![npm](https://img.shields.io/npm/dt/react-native-dates-picker.svg)](https://www.npmjs.com/package/react-native-dates-picker)
 
 React Native 的 DateTimePicker 组件，允许你创建一个可自定义的日期和时间选择器。该组件使用 [Day.js](https://day.js.org/) 库，并包含一组样式属性，使你可以根据自己的 UI 设计更改日历的每一项。
 

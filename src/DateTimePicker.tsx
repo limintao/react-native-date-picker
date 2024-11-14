@@ -209,57 +209,72 @@ const DateTimePicker = (
 
   const onSelectDate = useCallback(
     (datetime: DateType) => {
-      if (onChange)
-        if (mode === 'single') {
-          const newDate = timePicker ? datetime : getStartOfDay(datetime);
+      if (mode === 'single') {
+        const newDate = timePicker ? datetime : getStartOfDay(datetime);
 
-          dispatch({
-            type: CalendarActionKind.CHANGE_CURRENT_DATE,
-            payload: newDate,
-          });
+        dispatch({
+          type: CalendarActionKind.CHANGE_CURRENT_DATE,
+          payload: newDate,
+        });
 
-          (onChange as SingleChange)({
-            date: newDate,
-          });
-        } else if (mode === 'range') {
-          const sd = state.startDate;
-          const ed = state.endDate;
-          let isStart: boolean = true;
+        (onChange as SingleChange)?.({
+          date: newDate,
+        });
+      } else if (mode === 'range') {
+        const sd = state.startDate;
+        const ed = state.endDate;
+        let isStart: boolean = true;
 
-          if (sd && !ed && dateToUnix(datetime) >= dateToUnix(sd!))
-            isStart = false;
+        if (sd && !ed && dateToUnix(datetime) >= dateToUnix(sd!))
+          isStart = false;
 
-          (onChange as RangeChange)({
-            startDate: isStart ? getStartOfDay(datetime) : sd,
-            endDate: !isStart ? getEndOfDay(datetime) : undefined,
-          });
-        } else if (mode === 'multiple') {
-          const safeDates = (state.dates as DateType[]) || [];
-          const newDate = getStartOfDay(datetime);
+        const newDateRang = {
+          startDate: isStart ? getStartOfDay(datetime) : sd,
+          endDate: !isStart ? getEndOfDay(datetime) : undefined,
+        };
 
-          const exists = safeDates.some((ed) => areDatesOnSameDay(ed, newDate));
+        dispatch({
+          type: CalendarActionKind.CHANGE_SELECTED_RANGE,
+          payload: newDateRang,
+        });
 
-          const newDates = exists
-            ? safeDates.filter((ed) => !areDatesOnSameDay(ed, newDate))
-            : [...safeDates, newDate];
+        (onChange as RangeChange)?.(newDateRang);
+      } else if (mode === 'multiple') {
+        const safeDates = (state.dates as DateType[]) || [];
+        const newDate = getStartOfDay(datetime);
 
-          newDates.sort((a, b) => (dayjs(a).isAfter(dayjs(b)) ? 1 : -1));
+        const exists = safeDates.some((ed) => areDatesOnSameDay(ed, newDate));
 
-          (onChange as MultiChange)({
-            dates: newDates,
-            datePressed: newDate,
-            change: exists ? 'removed' : 'added',
-          });
-        } else if (mode === 'wheel') {
-          dispatch({
-            type: CalendarActionKind.CHANGE_CURRENT_DATE,
-            payload: datetime,
-          });
+        const newDates = exists
+          ? safeDates.filter((ed) => !areDatesOnSameDay(ed, newDate))
+          : [...safeDates, newDate];
 
-          (onChange as SingleChange)({
-            date: datetime,
-          });
-        }
+        newDates.sort((a, b) => (dayjs(a).isAfter(dayjs(b)) ? 1 : -1));
+
+        const newDatesObj = {
+          dates: newDates,
+          datePressed: newDate,
+          change: (exists
+            ? 'removed'
+            : 'added') as Parameters<MultiChange>[0]['change'],
+        };
+
+        dispatch({
+          type: CalendarActionKind.CHANGE_SELECTED_MULTIPLE,
+          payload: newDatesObj,
+        });
+
+        (onChange as MultiChange)?.(newDatesObj);
+      } else if (mode === 'wheel') {
+        dispatch({
+          type: CalendarActionKind.CHANGE_CURRENT_DATE,
+          payload: datetime,
+        });
+
+        (onChange as SingleChange)?.({
+          date: datetime,
+        });
+      }
     },
     [onChange, mode, timePicker, state.startDate, state.endDate, state.dates]
   );

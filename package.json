@@ -1,6 +1,6 @@
 {
   "name": "react-native-dates-picker",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Customizable date picker for React Native",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -31,7 +31,7 @@
     "lint": "eslint .",
     "prepack": "bob build",
     "release": "release-it",
-    "example": "yarn --cwd example",
+    "example": "cd example && yarn start",
     "bootstrap": "yarn example && yarn install"
   },
   "keywords": [
