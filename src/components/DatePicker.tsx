@@ -41,7 +41,7 @@ const DatePicker = () => {
 
   const { year: startYear, month: startMonth } = getParsedDate(minDate);
   const { year: endYear, month: endMonth } = getParsedDate(maxDate);
-  const years = createNumberList(startYear, endYear);
+  const years = createNumberList(startYear - 1, endYear);
   const months = useMemo(
     () =>
       createNumberList(
