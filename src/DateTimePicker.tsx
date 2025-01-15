@@ -292,8 +292,10 @@ const DateTimePicker = (
         type: CalendarActionKind.SET_CALENDAR_VIEW,
         payload: 'day',
       });
+      if (mode === 'single' || mode === 'wheel')
+        (onChange as SingleChange)?.({ date: getFormatted(newDate) });
     },
-    [maxDate, minDate, state.currentDate]
+    [maxDate, minDate, mode, onChange, state.currentDate]
   );
 
   const onSelectYear = useCallback(
@@ -309,8 +311,10 @@ const DateTimePicker = (
         type: CalendarActionKind.SET_CALENDAR_VIEW,
         payload: initialView,
       });
+      if (mode === 'single' || mode === 'wheel')
+        (onChange as SingleChange)?.({ date: getFormatted(newDate) });
     },
-    [state.currentDate, maxDate, minDate, initialView]
+    [state.currentDate, maxDate, minDate, initialView, mode, onChange]
   );
 
   const onChangeMonth = useCallback(

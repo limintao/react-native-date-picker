@@ -218,7 +218,7 @@ export default function App() {
               // maxDate={new Date()}
               //firstDayOfWeek={1}
               // columns={['year', 'month', 'day', 'hour', 'minute', 'second']}
-              // onChange={onChange}
+              onChange={onChange}
               headerButtonColor={theme?.mainColor}
               selectedItemColor={theme?.mainColor}
               // eslint-disable-next-line react-native/no-inline-styles
@@ -233,7 +233,7 @@ export default function App() {
               }}
             />
             <View style={styles.footer}>
-              {mode === 'single' ? (
+              {mode === 'single' || mode === 'wheel' ? (
                 <View style={styles.footerContainer}>
                   <Text>
                     {date
