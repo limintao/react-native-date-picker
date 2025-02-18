@@ -1,4 +1,4 @@
-import React from 'react';
+import { memo, useCallback } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { CalendarThemeProps, IDayObject } from '../types';
 import { CALENDAR_HEIGHT } from '../enums';
@@ -20,7 +20,7 @@ function EmptyDayPure({ height }: { height?: number }) {
   return <View style={style.dayCell} />;
 }
 
-export const EmptyDay = React.memo(EmptyDayPure);
+export const EmptyDay = memo(EmptyDayPure);
 
 function Day({
   date,
@@ -36,7 +36,7 @@ function Day({
   theme,
   height,
 }: Props) {
-  const onPress = React.useCallback(() => {
+  const onPress = useCallback(() => {
     onSelectDate(date);
   }, [onSelectDate, date]);
 
@@ -190,4 +190,4 @@ const customComparator = (
   );
 };
 
-export default React.memo(Day, customComparator);
+export default memo(Day, customComparator);

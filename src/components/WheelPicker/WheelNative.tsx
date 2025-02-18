@@ -1,4 +1,3 @@
-import React from 'react';
 import { StyleSheet, Platform, type ViewStyle } from 'react-native';
 import WheelPicker from 'react-native-wheely';
 import { useCalendarContext } from '../../CalendarContext';

@@ -78,19 +78,11 @@ export default function App() {
         />
 
         <View style={styles.modesContainer}>
-          <Text
-            style={{
-              // eslint-disable-next-line react-native/no-inline-styles
-              marginRight: 8,
-            }}
-          >
-            Mode:
-          </Text>
+          <Text style={{ marginRight: 8 }}>Mode:</Text>
           <TouchableOpacity
             style={[
               styles.modeSelect,
               {
-                // eslint-disable-next-line react-native/no-inline-styles
                 backgroundColor:
                   mode === 'single' ? theme?.mainColor : undefined,
               },
@@ -109,7 +101,6 @@ export default function App() {
           <TouchableOpacity
             style={[
               styles.modeSelect,
-              // eslint-disable-next-line react-native/no-inline-styles
               {
                 backgroundColor:
                   mode === 'range' ? theme?.mainColor : undefined,
@@ -129,7 +120,6 @@ export default function App() {
           <TouchableOpacity
             style={[
               styles.modeSelect,
-              // eslint-disable-next-line react-native/no-inline-styles
               {
                 backgroundColor:
                   mode === 'multiple' ? theme?.mainColor : undefined,
@@ -150,7 +140,6 @@ export default function App() {
             style={[
               styles.modeSelect,
               {
-                // eslint-disable-next-line react-native/no-inline-styles
                 backgroundColor:
                   mode === 'wheel' ? theme?.mainColor : undefined,
               },
@@ -215,19 +204,17 @@ export default function App() {
               displayFullDays
               timePicker={timePicker}
               // minDate={range.startDate}
-              // maxDate={new Date()}
-              //firstDayOfWeek={1}
+              maxDate={new Date('2025-02-18 00:00:00')}
+              // firstDayOfWeek={1}
               // columns={['year', 'month', 'day', 'hour', 'minute', 'second']}
               onChange={onChange}
               headerButtonColor={theme?.mainColor}
               selectedItemColor={theme?.mainColor}
-              // eslint-disable-next-line react-native/no-inline-styles
               selectedTextStyle={{
                 fontWeight: 'bold',
                 color: theme?.activeTextColor,
               }}
               wheelPickerItemStyle={{ paddingHorizontal: 0 }}
-              // eslint-disable-next-line react-native/no-inline-styles
               todayContainerStyle={{
                 borderWidth: 1,
               }}

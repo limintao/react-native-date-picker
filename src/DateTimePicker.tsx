@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useReducer } from 'react';
+import { memo, useCallback, useEffect, useReducer } from 'react';
 import {
   getFormatted,
   getDate,

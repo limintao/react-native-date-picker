@@ -1,4 +1,3 @@
-import React from 'react';
 import { Platform, type ViewStyle } from 'react-native';
 import WheelNative from './WheelNative';
 import WheelWeb from './WheelWeb';
