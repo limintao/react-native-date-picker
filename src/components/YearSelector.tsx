@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import React, { useCallback } from 'react';
 import {
   Text,
   View,
@@ -10,7 +10,7 @@ import {
 import { useCalendarContext } from '../CalendarContext';
 import { getDateYear, getYearRange } from '../utils';
 
-const YearSelector = () => {
+const YearSelector: React.FC = () => {
   const { currentDate, currentYear, onSelectYear, theme } =
     useCalendarContext();
   const selectedYear = getDateYear(currentDate);

@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import type { DateType, IDayObject } from './types';
+import type { DateType, IDayObject, PickerOption } from './types';
 
 export const CALENDAR_FORMAT = 'YYYY-MM-DD HH:mm:ss';
 export const DATE_FORMAT = 'YYYY-MM-DD';
@@ -105,7 +105,7 @@ export function getDaysNumInMonth(
   month: number,
   minDate: DateType,
   maxDate: DateType
-): string[] {
+): Array<PickerOption> {
   const formattedMonth = String(month).padStart(2, '0');
   const date = dayjs(`${year}-${formattedMonth}-01`);
   const daysInMonth = date.daysInMonth();
@@ -121,7 +121,7 @@ export function getDaysNumInMonth(
       (currentDate.isAfter(minDay) || currentDate.isSame(minDay, 'day')) &&
       (currentDate.isBefore(maxDay) || currentDate.isSame(maxDay, 'day'))
     )
-      daysArray.push(String(day).padStart(2, '0'));
+      daysArray.push({ value: day, text: String(day).padStart(2, '0') });
   }
   return daysArray;
 }

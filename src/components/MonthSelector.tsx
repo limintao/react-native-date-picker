@@ -1,8 +1,9 @@
+import React from 'react';
 import { Text, View, Pressable, StyleSheet } from 'react-native';
 import { useCalendarContext } from '../CalendarContext';
 import { getParsedDate, getMonths } from '../utils';
 
-const MonthSelector = () => {
+const MonthSelector: React.FC = () => {
   const { currentDate, onSelectMonth, theme } = useCalendarContext();
   const { month } = getParsedDate(currentDate);
 

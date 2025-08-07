@@ -109,3 +109,8 @@ export interface DatePickerBaseProps {
   initialView?: CalendarViews;
   height?: number;
 }
+
+export type PickerOption = {
+  value: number | string;
+  text: string;
+};

@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import dayjs from 'dayjs';
 import { useCalendarContext } from '../CalendarContext';
@@ -14,7 +14,7 @@ import {
   getFormatted,
 } from '../utils';
 
-const DaySelector = () => {
+const DaySelector: React.FC = () => {
   const {
     mode,
     date,
@@ -117,7 +117,7 @@ const DaySelector = () => {
               if (inRange && !leftCrop && !rightCrop) isSelected = false;
             }
           } else if (mode === 'single')
-            isSelected = areDatesOnSameDay(day.date, currentDate);
+            isSelected = areDatesOnSameDay(day.date, date);
 
           return {
             ...day,

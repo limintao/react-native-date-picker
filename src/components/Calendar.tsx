@@ -1,4 +1,4 @@
-import { ReactNode, memo } from 'react';
+import React, { ReactNode, memo } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useCalendarContext } from '../CalendarContext';
 import type { CalendarViews } from '../enums';
@@ -9,7 +9,7 @@ import MonthSelector from './MonthSelector';
 import DaySelector from './DaySelector';
 import TimeSelector from './TimeSelector';
 import DatePicker from './DatePicker';
-import { CALENDAR_HEIGHT } from '../enums';
+import { CONTAINER_HEIGHT } from '../enums';
 
 const CalendarView: Record<CalendarViews, ReactNode> = {
   year: <YearSelector />,
@@ -23,12 +23,12 @@ interface PropTypes extends HeaderProps {
   containerStyle?: CalendarThemeProps['containerStyle'];
 }
 
-const Calendar = ({
+const Calendar: React.FC<PropTypes> = ({
   buttonPrevIcon,
   buttonNextIcon,
   height,
   containerStyle,
-}: PropTypes) => {
+}) => {
   const { calendarView, mode } = useCalendarContext();
 
   const styles = StyleSheet.create({
@@ -36,7 +36,7 @@ const Calendar = ({
       width: '100%',
     },
     calendarContainer: {
-      height: height || CALENDAR_HEIGHT,
+      height: height || CONTAINER_HEIGHT,
       alignItems: 'center',
     },
   });

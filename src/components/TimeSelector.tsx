@@ -1,23 +1,22 @@
-import { useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import { useCalendarContext } from '../CalendarContext';
 import Wheel from './WheelPicker/Wheel';
-import { CALENDAR_HEIGHT } from '../enums';
+import { CONTAINER_HEIGHT } from '../enums';
 import { getParsedDate, getDate, getFormatted } from '../utils';
 
 function createNumberList(num: number) {
-  return new Array(num)
-    .fill(0)
-    .map((_, index) =>
-      index < 10 ? `0${index.toString()}` : index.toString()
-    );
+  return new Array(num).fill(0).map((_, index) => ({
+    text: index.toString().padStart(2, '0'),
+    value: index,
+  }));
 }
 
 const hours = createNumberList(24);
 const minutes = createNumberList(60);
 const seconds = createNumberList(60);
 
-const TimeSelector = () => {
+const TimeSelector: React.FC = () => {
   const { date, onSelectDate, theme } = useCalendarContext();
   const { hour, minute, second } = getParsedDate(date);
 
@@ -87,8 +86,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '80%',
-    height: CALENDAR_HEIGHT / 2,
+    width: CONTAINER_HEIGHT / 2,
+    height: CONTAINER_HEIGHT / 2,
   },
   timePickerText: {
     fontSize: 24,

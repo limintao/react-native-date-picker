@@ -1,8 +1,8 @@
-import { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useCalendarContext } from '../CalendarContext';
 import Wheel from './WheelPicker/Wheel';
-import { CALENDAR_HEIGHT } from '../enums';
+import { CONTAINER_HEIGHT } from '../enums';
 import {
   getFormatted,
   getParsedDate,
@@ -11,13 +11,14 @@ import {
   getDate,
 } from '../utils';
 
-function createNumberList(start: number, end: number) {
-  return new Array(end - start)
-    .fill(0)
-    .map((_, index) => String(index + 1 + start).padStart(2, '0'));
+function createNumberList(start: number, end: number, first: number = 1) {
+  return new Array(end - start).fill(0).map((_, index) => ({
+    value: index + first + start,
+    text: String(index + first + start).padStart(2, '0'),
+  }));
 }
 
-const DatePicker = () => {
+const DatePicker: React.FC = () => {
   const {
     columns,
     currentDate,
@@ -41,6 +42,7 @@ const DatePicker = () => {
 
   const { year: startYear, month: startMonth } = getParsedDate(minDate);
   const { year: endYear, month: endMonth } = getParsedDate(maxDate);
+  const { hour, minute, second } = getParsedDate(currentDate);
   const years = createNumberList(startYear - 1, endYear);
   const months = useMemo(
     () =>
@@ -57,31 +59,32 @@ const DatePicker = () => {
   );
   const hours = useMemo(
     () =>
-      createNumberList(...getTimeRange(currentDate, minDate, maxDate, 'hour')),
+      createNumberList(
+        ...getTimeRange(currentDate, minDate, maxDate, 'hour'),
+        0
+      ),
     [currentDate, maxDate, minDate]
   );
   const minutes = useMemo(
     () =>
       createNumberList(
-        ...getTimeRange(currentDate, minDate, maxDate, 'minute')
+        ...getTimeRange(currentDate, minDate, maxDate, 'minute'),
+        0
       ),
     [currentDate, maxDate, minDate]
   );
   const seconds = useMemo(
     () =>
       createNumberList(
-        ...getTimeRange(currentDate, minDate, maxDate, 'second')
+        ...getTimeRange(currentDate, minDate, maxDate, 'second'),
+        0
       ),
     [currentDate, maxDate, minDate]
   );
 
   const handleChangeDate = useCallback(
-    (
-      value: number,
-      data: Array<string>,
-      type: 'date' | 'hour' | 'minute' | 'second'
-    ) => {
-      const newDate = getDate(currentDate)[type](Number(data[value]));
+    (value: number, type: 'date' | 'hour' | 'minute' | 'second') => {
+      const newDate = getDate(currentDate).set(type, value);
       onSelectDate(getFormatted(newDate));
     },
     [currentDate, onSelectDate]
@@ -107,63 +110,49 @@ const DatePicker = () => {
           <View style={styles.wheelContainer} key={item}>
             {item === 'year' && (
               <Wheel
-                value={years.indexOf(String(year))}
+                value={year}
                 items={years}
-                key={years.length}
-                setValue={(value) => onSelectYear(Number(years[value]))}
+                setValue={(value) => onSelectYear(value)}
                 indicatorStyle={createIndicatorStyle(index)}
               />
             )}
             {item === 'month' && (
               <Wheel
-                value={months.indexOf(String(month + 1).padStart(2, '0'))}
+                value={month + 1}
                 items={months}
-                key={months.length}
-                setValue={(value) => onSelectMonth(Number(months[value]) - 1)}
+                setValue={(value) => onSelectMonth(value - 1)}
                 indicatorStyle={createIndicatorStyle(index)}
               />
             )}
             {item === 'day' && (
               <Wheel
-                value={days.indexOf(
-                  String(getDate(currentDate).date()).padStart(2, '0')
-                )}
-                key={days.length}
+                value={getDate(currentDate).date()}
                 items={days}
-                setValue={(value) => handleChangeDate(value, days, 'date')}
+                setValue={(value) => handleChangeDate(value, 'date')}
                 indicatorStyle={createIndicatorStyle(index)}
               />
             )}
             {item === 'hour' && (
               <Wheel
-                value={hours.indexOf(
-                  String(getDate(currentDate).hour()).padStart(2, '0')
-                )}
-                key={hours.length}
+                value={hour}
                 items={hours}
-                setValue={(value) => handleChangeDate(value, hours, 'hour')}
+                setValue={(value) => handleChangeDate(value, 'hour')}
                 indicatorStyle={createIndicatorStyle(index)}
               />
             )}
             {item === 'minute' && (
               <Wheel
-                value={minutes.indexOf(
-                  String(getDate(currentDate).minute()).padStart(2, '0')
-                )}
-                key={minutes.length}
+                value={minute}
                 items={minutes}
-                setValue={(value) => handleChangeDate(value, minutes, 'minute')}
+                setValue={(value) => handleChangeDate(value, 'minute')}
                 indicatorStyle={createIndicatorStyle(index)}
               />
             )}
             {item === 'second' && (
               <Wheel
-                value={seconds.indexOf(
-                  String(getDate(currentDate).second()).padStart(2, '0')
-                )}
-                key={seconds.length}
+                value={second}
                 items={seconds}
-                setValue={(value) => handleChangeDate(value, seconds, 'second')}
+                setValue={(value) => handleChangeDate(value, 'second')}
                 indicatorStyle={createIndicatorStyle(index)}
               />
             )}
@@ -179,16 +168,18 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    width: '100%',
   },
   wheelContainer: {
     flex: 1,
   },
   datePickerContainer: {
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 16,
-    height: CALENDAR_HEIGHT / 2,
+    height: CONTAINER_HEIGHT / 2,
   },
 });
 

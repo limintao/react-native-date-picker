@@ -84,9 +84,11 @@
     "@types/react-test-renderer": "^18.0.5",
     "commitlint": "^17.0.2",
     "del-cli": "^5.0.0",
-    "eslint": "^8.4.1",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.0.0",
+    "eslint": "^9.20.0",
+    "eslint-config-prettier": "^10.0.0",
+    "eslint-plugin-prettier": "^5.2.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-native": "^5.0.0",
     "pod-install": "^0.1.0",
     "prettier": "^2.0.5",
     "react": "^18.2.0",
@@ -193,7 +195,6 @@
   },
   "dependencies": {
     "dayjs": "^1.11.12",
-    "lodash": "^4.17.21",
-    "react-native-wheely": "^0.6.0"
+    "lodash": "^4.17.21"
   }
 }

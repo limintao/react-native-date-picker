@@ -1,36 +1,41 @@
-import { memo, useMemo, useRef } from 'react';
+import React, { memo, useMemo, useRef } from 'react';
 import {
   Animated,
   PanResponder,
   StyleSheet,
   View,
   Platform,
+  Text,
 } from 'react-native';
-import { useCalendarContext } from '../../CalendarContext';
-import { sin } from './AnimatedMath';
-import { CALENDAR_HEIGHT } from '../../enums';
+import { sin } from './animated-math';
+import { CONTAINER_HEIGHT } from '../../enums';
+import { PickerOption } from '../../types';
+import { isEqual } from 'lodash';
 
 interface WheelProps {
-  value: number;
-  setValue?: (value: number) => void;
-  items: string[];
+  value: number | string;
+  setValue?: (value: any) => void;
+  items: PickerOption[];
 }
 
-const WheelWeb = ({ value, setValue = () => {}, items }: WheelProps) => {
-  const { theme } = useCalendarContext();
+const ITEM_HEIGHT = 44;
 
+const WheelWeb: React.FC<WheelProps> = ({
+  value,
+  setValue = () => {},
+  items,
+}) => {
   const displayCount = 5;
   const translateY = useRef(new Animated.Value(0)).current;
   const renderCount =
     displayCount * 2 < items.length ? displayCount * 8 : displayCount * 2 - 1;
   const circular = items.length >= displayCount;
-  const height = 130;
+  const height = 140;
   const radius = height / 2;
 
-  const valueIndex = useMemo(
-    () => items.indexOf(('0' + value).slice(-2)),
-    [items, value]
-  );
+  const valueIndex = useMemo(() => {
+    return items.findIndex((item) => item.value === value) || 0;
+  }, [items, value]);
 
   const panResponder = useMemo(() => {
     return PanResponder.create({
@@ -54,11 +59,12 @@ const WheelWeb = ({ value, setValue = () => {}, items }: WheelProps) => {
         else if (newValueIndex >= items.length)
           newValueIndex = items.length - 1;
 
-        const newValue = items[newValueIndex] || '00';
-        if (newValue === ('0' + value).slice(-2)) {
+        const newValue = items[newValueIndex];
+        if (newValue?.value === value) {
           translateY.setOffset(0);
           translateY.setValue(0);
-        } else setValue(parseInt(newValue, 10));
+        } else if (newValue?.value) setValue(newValue.value);
+        else if (items[0]?.value) setValue(items[0].value);
       },
     });
   }, [
@@ -77,19 +83,21 @@ const WheelWeb = ({ value, setValue = () => {}, items }: WheelProps) => {
 
     return Array.from({ length: renderCount }, (_, index) => {
       let targetIndex = valueIndex + index - centerIndex;
-      if (targetIndex < 0 || targetIndex >= items.length) {
-        if (!circular) return 0;
+      if (circular)
+        targetIndex =
+          ((targetIndex % items.length) + items.length) % items.length;
+      else targetIndex = Math.max(0, Math.min(targetIndex, items.length - 1));
 
-        targetIndex = (targetIndex + items.length) % items.length;
-      }
-      return items[targetIndex] || 0;
+      return items[targetIndex] || items[0];
     });
   }, [renderCount, valueIndex, items, circular]);
 
   const animatedAngles = useMemo(() => {
     //translateY.setValue(0);
     translateY.setOffset(0);
-    const currentIndex = displayValues.indexOf(('0' + value).slice(-2));
+    const currentIndex = displayValues.findIndex(
+      (item) => item?.value === value
+    );
     return displayValues && displayValues.length > 0
       ? displayValues.map((_, index) =>
           translateY
@@ -112,54 +120,57 @@ const WheelWeb = ({ value, setValue = () => {}, items }: WheelProps) => {
   }, [displayValues, radius, value, displayCount, translateY]);
 
   return (
-    <View style={[styles.container]} {...panResponder.panHandlers}>
+    <View style={[defaultStyles.container]} {...panResponder.panHandlers}>
+      <View
+        style={[
+          defaultStyles.selectedIndicator,
+          {
+            transform: [{ translateY: -ITEM_HEIGHT / 2 }],
+            height: ITEM_HEIGHT,
+          },
+        ]}
+      />
       {displayValues?.map((displayValue, index) => {
         const animatedAngle = animatedAngles[index];
         return (
-          <Animated.Text
-            key={`${displayValue}-${index}`}
-            style={[
-              { ...styles.wheelPickerText, ...theme?.wheelPickerTextStyle },
-              // eslint-disable-next-line react-native/no-inline-styles
-              {
-                position: 'absolute',
-                height: 25,
-                transform: animatedAngle
-                  ? [
-                      {
-                        translateY: Animated.multiply(
-                          radius,
-                          sin(animatedAngle)
-                        ),
-                      },
-                      {
-                        rotateX: animatedAngle.interpolate({
-                          inputRange: [-Math.PI / 2, Math.PI / 2],
-                          outputRange: ['-89deg', '89deg'],
-                          extrapolate: 'clamp',
-                        }),
-                      },
-                    ]
-                  : [],
-                opacity: displayValue !== ('0' + value).slice(-2) ? 0.3 : 1,
-              },
-            ]}
+          <Animated.View
+            key={`${displayValue?.text}-${index}`}
+            // eslint-disable-next-line react-native/no-inline-styles
+            style={{
+              position: 'absolute',
+              height: ITEM_HEIGHT - 10,
+              transform: animatedAngle
+                ? [
+                    {
+                      translateY: Animated.multiply(radius, sin(animatedAngle)),
+                    },
+                    {
+                      rotateX: animatedAngle.interpolate({
+                        inputRange: [-Math.PI / 2, Math.PI / 2],
+                        outputRange: ['-89deg', '89deg'],
+                        extrapolate: 'clamp',
+                      }),
+                    },
+                  ]
+                : [],
+              opacity: displayValue?.value !== value ? 0.3 : 1,
+            }}
           >
-            {displayValue}
-          </Animated.Text>
+            <Text>{displayValue?.text}</Text>
+          </Animated.View>
         );
       })}
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const defaultStyles = StyleSheet.create({
   container: {
     minWidth: 30,
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
-    height: CALENDAR_HEIGHT / 2,
+    height: CONTAINER_HEIGHT / 2,
     ...Platform.select({
       web: {
         cursor: 'pointer',
@@ -171,15 +182,23 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  wheelPickerText: {
-    fontSize: 20,
-    fontWeight: '500',
+  selectedIndicator: {
+    position: 'absolute',
+    width: '100%',
+    top: '50%',
   },
 });
 
-export default memo(WheelWeb, (prevProps, nextProps) => {
-  return (
-    prevProps.value === nextProps.value &&
-    prevProps.setValue === nextProps.setValue
-  );
-});
+const customComparator = (
+  prev: Readonly<WheelProps>,
+  next: Readonly<WheelProps>
+) => {
+  const areEqual =
+    prev.value === next.value &&
+    prev.setValue === next.setValue &&
+    isEqual(prev.items, next.items);
+
+  return areEqual;
+};
+
+export default memo(WheelWeb, customComparator);

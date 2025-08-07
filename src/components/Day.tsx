@@ -1,7 +1,7 @@
-import { memo, useCallback } from 'react';
+import React, { memo, useCallback } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { CalendarThemeProps, IDayObject } from '../types';
-import { CALENDAR_HEIGHT } from '../enums';
+import { CONTAINER_HEIGHT } from '../enums';
 import { addColorAlpha } from '../utils';
 import { isEqual } from 'lodash';
 
@@ -16,13 +16,13 @@ interface Props extends Omit<IDayObject, 'day'> {
 }
 
 function EmptyDayPure({ height }: { height?: number }) {
-  const style = styles(height || CALENDAR_HEIGHT);
+  const style = styles(height || CONTAINER_HEIGHT);
   return <View style={style.dayCell} />;
 }
 
 export const EmptyDay = memo(EmptyDayPure);
 
-function Day({
+const Day: React.FC<Props> = ({
   date,
   text,
   disabled,
@@ -35,7 +35,7 @@ function Day({
   onSelectDate,
   theme,
   height,
-}: Props) {
+}) => {
   const onPress = useCallback(() => {
     onSelectDate(date);
   }, [onSelectDate, date]);
@@ -83,7 +83,7 @@ function Day({
   const rangeRootBackground =
     selectedRangeBackgroundColor ?? addColorAlpha(selectedItemColor, 0.15);
 
-  const style = styles(height || CALENDAR_HEIGHT);
+  const style = styles(height || CONTAINER_HEIGHT);
 
   return (
     <View style={style.dayCell}>
@@ -138,7 +138,7 @@ function Day({
       </Pressable>
     </View>
   );
-}
+};
 
 const styles = (height: number) =>
   StyleSheet.create({

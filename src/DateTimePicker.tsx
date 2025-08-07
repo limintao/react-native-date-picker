@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useReducer } from 'react';
+import React, { memo, useCallback, useEffect, useReducer } from 'react';
 import {
   getFormatted,
   getDate,
@@ -73,13 +73,12 @@ export interface DatePickerWheelProps
   onChange?: SingleChange;
 }
 
-const DateTimePicker = (
-  props:
-    | DatePickerSingleProps
-    | DatePickerRangeProps
-    | DatePickerMultipleProps
-    | DatePickerWheelProps
-) => {
+const DateTimePicker: React.FC<
+  | DatePickerSingleProps
+  | DatePickerRangeProps
+  | DatePickerMultipleProps
+  | DatePickerWheelProps
+> = (props) => {
   const {
     mode = 'single',
     locale = 'zh-cn',
@@ -121,6 +120,7 @@ const DateTimePicker = (
     currentDate = dayjs(dates[0]);
 
   if (minDate && currentDate.isBefore(minDate)) currentDate = dayjs(minDate);
+  if (maxDate && currentDate.isAfter(maxDate)) currentDate = dayjs(maxDate);
 
   let currentYear = currentDate.year();
 
@@ -201,7 +201,12 @@ const DateTimePicker = (
         type: CalendarActionKind.CHANGE_SELECTED_DATE,
         payload: { date },
       });
-  }, [mode, date, startDate, endDate, dates, minDate, timePicker]);
+
+    dispatch({
+      type: CalendarActionKind.CHANGE_CURRENT_DATE,
+      payload: currentDate,
+    });
+  }, [mode, date, startDate, endDate, dates, minDate, timePicker, currentDate]);
 
   const setCalendarView = useCallback((view: CalendarViews) => {
     dispatch({ type: CalendarActionKind.SET_CALENDAR_VIEW, payload: view });

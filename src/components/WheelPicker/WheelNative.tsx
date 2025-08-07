@@ -1,48 +1,34 @@
-import { StyleSheet, Platform, type ViewStyle } from 'react-native';
-import WheelPicker from 'react-native-wheely';
-import { useCalendarContext } from '../../CalendarContext';
+import React, { memo } from 'react';
+import { StyleSheet, Platform } from 'react-native';
+import WheelPicker from './WheelNativePicker';
+import { PickerOption } from '../../types';
 
 interface WheelProps {
-  value: number;
-  setValue?: (value: number) => void;
-  items: string[];
-  indicatorStyle?: ViewStyle;
+  value: number | string;
+  setValue?: (value: any) => void;
+  items: PickerOption[];
 }
 
-export default function WheelNative({
+const WheelNative: React.FC<WheelProps> = ({
   value,
   setValue = () => {},
   items,
-  indicatorStyle,
-}: WheelProps) {
-  const { theme } = useCalendarContext();
-
+}) => {
   return (
     <WheelPicker
-      selectedIndex={value < 0 ? 0 : value}
+      value={value}
       options={items}
       onChange={setValue}
-      containerStyle={{
-        ...styles.container,
-        ...theme?.wheelPickerContainerStyle,
-      }}
-      itemStyle={theme?.wheelPickerItemStyle}
-      itemTextStyle={{
-        ...styles.wheelPickerText,
-        ...theme?.wheelPickerTextStyle,
-      }}
-      selectedIndicatorStyle={{
-        ...styles.wheelSelectedIndicator,
-        ...indicatorStyle,
-        ...theme?.wheelPickerIndicatorStyle,
-      }}
-      itemHeight={45}
-      decelerationRate={theme?.wheelPickerDecelerationRate}
+      containerStyle={defaultStyles.container}
+      itemHeight={44}
+      decelerationRate="fast"
     />
   );
-}
+};
 
-const styles = StyleSheet.create({
+export default memo(WheelNative);
+
+const defaultStyles = StyleSheet.create({
   container: {
     display: 'flex',
     ...Platform.select({
@@ -50,12 +36,5 @@ const styles = StyleSheet.create({
         userSelect: 'none',
       },
     }),
-  },
-  wheelSelectedIndicator: {
-    borderRadius: 10,
-  },
-  wheelPickerText: {
-    fontSize: 18,
-    fontWeight: '500',
   },
 });
