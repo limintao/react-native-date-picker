@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import WheelPicker from './WheelNativePicker';
-import { PickerOption } from '../../types';
+import { PickerOption } from 'src/types';
 
 interface PeriodProps {
   value: string;

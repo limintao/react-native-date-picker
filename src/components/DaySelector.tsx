@@ -1,8 +1,7 @@
 import React, { useMemo, useCallback } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import dayjs from 'dayjs';
-import { useCalendarContext } from '../CalendarContext';
-import Day, { EmptyDay } from './Day';
+import { useCalendarContext } from 'src/CalendarContext';
 import {
   getParsedDate,
   getMonthDays,
@@ -12,7 +11,8 @@ import {
   isDateBetween,
   getDate,
   getFormatted,
-} from '../utils';
+} from 'src/utils';
+import Day, { EmptyDay } from './Day';
 
 const DaySelector: React.FC = () => {
   const {

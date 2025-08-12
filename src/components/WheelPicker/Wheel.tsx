@@ -1,14 +1,13 @@
 import React, { memo } from 'react';
-import { Platform, type ViewStyle } from 'react-native';
+import { Platform } from 'react-native';
 import WheelNative from './WheelNative';
 import WheelWeb from './WheelWeb';
-import { PickerOption } from '../../types';
+import { PickerOption } from 'src/types';
 
 interface WheelProps {
   value: number;
   setValue?: (value: number) => void;
   items: Array<PickerOption>;
-  indicatorStyle?: ViewStyle;
 }
 
 const Wheel: React.FC<WheelProps> = (props) => {

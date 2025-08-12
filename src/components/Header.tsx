@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react';
 import { View, Text, Pressable, StyleSheet, Image } from 'react-native';
-import { useCalendarContext } from '../CalendarContext';
 import dayjs from 'dayjs';
-import type { HeaderProps } from '../types';
-import { getDateYear, getYearRange, YEAR_PAGE_SIZE } from '../utils';
+import { useCalendarContext } from 'src/CalendarContext';
+import type { HeaderProps } from 'src/types';
+import { getDateYear, getYearRange, YEAR_PAGE_SIZE } from 'src/utils';
 
 const Header: React.FC<HeaderProps> = ({ buttonPrevIcon, buttonNextIcon }) => {
   const {

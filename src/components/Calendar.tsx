@@ -1,15 +1,15 @@
 import React, { ReactNode, memo } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { useCalendarContext } from '../CalendarContext';
-import type { CalendarViews } from '../enums';
-import type { HeaderProps, CalendarThemeProps } from '../types';
+import { CONTAINER_HEIGHT } from 'src/enums';
+import { useCalendarContext } from 'src/CalendarContext';
+import type { CalendarViews } from 'src/enums';
+import type { HeaderProps, CalendarThemeProps } from 'src/types';
 import Header from './Header';
 import YearSelector from './YearSelector';
 import MonthSelector from './MonthSelector';
 import DaySelector from './DaySelector';
 import TimeSelector from './TimeSelector';
 import DatePicker from './DatePicker';
-import { CONTAINER_HEIGHT } from '../enums';
 
 const CalendarView: Record<CalendarViews, ReactNode> = {
   year: <YearSelector />,

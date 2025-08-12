@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
-import { useCalendarContext } from '../CalendarContext';
+import { useCalendarContext } from 'src/CalendarContext';
+import { CONTAINER_HEIGHT } from 'src/enums';
+import { getParsedDate, getDate, getFormatted } from 'src/utils';
 import Wheel from './WheelPicker/Wheel';
-import { CONTAINER_HEIGHT } from '../enums';
-import { getParsedDate, getDate, getFormatted } from '../utils';
 
 function createNumberList(num: number) {
   return new Array(num).fill(0).map((_, index) => ({

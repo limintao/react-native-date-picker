@@ -121,34 +121,33 @@ const styles = StyleSheet.create({
 
 ## Styling props
 
-| Name                         | Type                           | Default     | Description                                                    |
-| ---------------------------- | ------------------------------ | ----------- | -------------------------------------------------------------- |
-| calendarTextStyle            | `TextStyle`                    | `null`      | 定义日历内部所有文本的样式（包括日、月、年、时、分和秒）                |
-| selectedTextStyle            | `TextStyle`                    | `null`      | 定义选中（日、月、年）文本的样式                                    |
-| selectedItemColor            | `string`                       | `'#0047FF'` | 定义选中（日、月、年）项的背景和边框颜色                              |
-| selectedRangeBackgroundColor | `string`                       | `undefined` | 定义选中范围的背景颜色                                             |
-| headerContainerStyle         | `ViewStyle`                    | `null`      | 定义日历头部容器的样式                                             |
-| headerTextContainerStyle     | `ViewStyle`                    | `null`      | 定义日历头部文本（月、年、时间）容器的样式                            |
-| headerTextStyle              | `TextStyle`                    | `null`      | 定义日历头部文本的样式（月、年、时间）                                |
-| headerButtonStyle            | `ViewStyle`                    | `null`      | 定义日历头部“上一个和下一个按钮”容器的样式                            |
-| headerButtonColor            | `string`                       | `null`      | 定义日历头部“上一个和下一个按钮”图标的颜色                            |
-| headerButtonSize             | `number`                       | `18`        | 定义日历头部“上一个和下一个按钮”图标的大小                            |
-| headerButtonsPosition        | `string`                       | `'around'`  | 定义日历头部“上一个和下一个按钮”的位置 `['around', 'right', 'left']` |
-| buttonPrevIcon               | `ReactNode`                    | `undefined` | 定义日历头部“上一个按钮”的自定义图标                                 |
-| buttonNextIcon               | `ReactNode`                    | `undefined` | 定义日历头部“下一个按钮”的自定义图标                                 |
-| daysPanelStyle               | `ViewStyle`                    | `null`      | 定义日期选择面板的样式                                             |
-| dayContainerStyle            | `ViewStyle`                    | `null`      | 定义每个日期的容器样式                                             |
-| todayContainerStyle          | `ViewStyle`                    | `null`      | 定义“今天”容器的样式                                              |
-| todayTextStyle               | `TextStyle`                    | `null`      | 定义“今天”文本的样式                                              |
-| monthContainerStyle          | `ViewStyle`                    | `null`      | 定义月份容器的样式                                                |
-| yearContainerStyle           | `ViewStyle`                    | `null`      | 定义年份容器的样式                                                |
-| weekDaysContainerStyle       | `ViewStyle`                    | `null`      | 定义星期容器的样式                                                |
-| weekDaysTextStyle            | `TextStyle`                    | `null`      | 定义星期文本的样式                                                |
-| wheelPickerContainerStyle    | `ViewStyle`                    | `null`      | 定义滚轮选择容器的样式                                             |
-| wheelPickerTextStyle         | `TextStyle`                    | `null`      | 定义滚轮选择器文本（年、月、日、时、分、秒）的样式                     |
-| wheelPickerItemStyle         | `TextStyle`                    | `null`      | 定义滚轮选择器选项容器的样式                                        |
-| wheelPickerIndicatorStyle    | `ViewStyle`                    | `null`      | 定义选中滚轮指示器的样式                                           |
-| wheelPickerDecelerationRate  | `'normal'`, `'fast'`, `number` | `'fast'`    | 定义用户抬起手指后，底层滚动视图的减速速度                            |
+| Name                                 | Type                           | Default       | Description                                                       |
+| ------------------------------------ | ------------------------------ | ------------- | ----------------------------------------------------------------- |
+| calendarTextStyle                    | `TextStyle`                    | `null`        | 定义日历内部所有文本的样式（包括日、月、年、时、分和秒）             |
+| selectedTextStyle                    | `TextStyle`                    | `null`        | 定义选中（日、月、年）文本的样式                                     |
+| selectedItemColor                    | `string`                       | `'#0047FF'` | 定义选中（日、月、年）项的背景和边框颜色                             |
+| selectedRangeBackgroundColor         | `string`                       | `undefined`   | 定义选中范围的背景颜色                                               |
+| headerContainerStyle                 | `ViewStyle`                    | `null`        | 定义日历头部容器的样式                                               |
+| headerTextContainerStyle             | `ViewStyle`                    | `null`        | 定义日历头部文本（月、年、时间）容器的样式                           |
+| headerTextStyle                      | `TextStyle`                    | `null`        | 定义日历头部文本的样式（月、年、时间）                               |
+| headerButtonStyle                    | `ViewStyle`                    | `null`        | 定义日历头部“上一个和下一个按钮”容器的样式                           |
+| headerButtonColor                    | `string`                       | `null`        | 定义日历头部“上一个和下一个按钮”图标的颜色                           |
+| headerButtonSize                     | `number`                       | `18`          | 定义日历头部“上一个和下一个按钮”图标的大小                           |
+| headerButtonsPosition                | `string`                       | `'around'`    | 定义日历头部“上一个和下一个按钮”的位置 `['around', 'right', 'left']` |
+| buttonPrevIcon                       | `ReactNode`                    | `undefined`   | 定义日历头部“上一个按钮”的自定义图标                                 |
+| buttonNextIcon                       | `ReactNode`                    | `undefined`   | 定义日历头部“下一个按钮”的自定义图标                                 |
+| daysPanelStyle                       | `ViewStyle`                    | `null`        | 定义日期选择面板的样式                                               |
+| dayContainerStyle                    | `ViewStyle`                    | `null`        | 定义每个日期的容器样式                                               |
+| todayContainerStyle                  | `ViewStyle`                    | `null`        | 定义“今天”容器的样式                                                 |
+| todayTextStyle                       | `TextStyle`                    | `null`        | 定义“今天”文本的样式                                                 |
+| monthContainerStyle                  | `ViewStyle`                    | `null`        | 定义月份容器的样式                                                   |
+| yearContainerStyle                   | `ViewStyle`                    | `null`        | 定义年份容器的样式                                                   |
+| weekDaysContainerStyle               | `ViewStyle`                    | `null`        | 定义星期容器的样式                                                   |
+| weekDaysTextStyle                    | `TextStyle`                    | `null`        | 定义星期文本的样式                                                   |
+| wheelPickerContainerStyle            | `ViewStyle`                    | `null`        | 定义滚轮选择容器的样式                                               |
+| wheelPickerTextStyle                 | `TextStyle`                    | `null`        | 定义滚轮选择器文本（年、月、日、时、分、秒）的样式                   |
+| wheelPickerItemStyle                 | `TextStyle`                    | `null`        | 定义滚轮选择器选项容器的样式                                         |
+| wheelPickerSelectedIndicatorStyle    | `ViewStyle`                    | `null`        | 定义选中滚轮指示器的样式                                             |
 
 ## Contributing
 

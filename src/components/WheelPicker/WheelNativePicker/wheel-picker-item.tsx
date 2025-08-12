@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
 import { Animated, Text, StyleSheet } from 'react-native';
+import { useCalendarContext } from 'src/CalendarContext';
 import { PickerOption } from 'src/types';
 
 interface ItemProps {
@@ -23,6 +24,7 @@ const WheelPickerItem: React.FC<ItemProps> = ({
   rotationFunction,
   scaleFunction,
 }) => {
+  const { theme } = useCalendarContext();
   const relativeScrollIndex = Animated.subtract(index, currentScrollIndex);
 
   const translateY = relativeScrollIndex.interpolate({
@@ -118,9 +120,10 @@ const WheelPickerItem: React.FC<ItemProps> = ({
           opacity,
           transform: [{ translateY }, { rotateX }, { scale }],
         },
+        theme.wheelPickerItemStyle,
       ]}
     >
-      <Text>{option?.text}</Text>
+      <Text style={theme.wheelPickerTextStyle}>{option?.text}</Text>
     </Animated.View>
   );
 };

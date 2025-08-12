@@ -7,10 +7,11 @@ import {
   Platform,
   Text,
 } from 'react-native';
-import { sin } from './animated-math';
-import { CONTAINER_HEIGHT } from '../../enums';
-import { PickerOption } from '../../types';
 import { isEqual } from 'lodash';
+import { CONTAINER_HEIGHT } from 'src/enums';
+import { PickerOption } from 'src/types';
+import { useCalendarContext } from 'src/CalendarContext';
+import { sin } from './animated-math';
 
 interface WheelProps {
   value: number | string;
@@ -25,6 +26,7 @@ const WheelWeb: React.FC<WheelProps> = ({
   setValue = () => {},
   items,
 }) => {
+  const { theme } = useCalendarContext();
   const displayCount = 5;
   const translateY = useRef(new Animated.Value(0)).current;
   const renderCount =
@@ -120,7 +122,10 @@ const WheelWeb: React.FC<WheelProps> = ({
   }, [displayValues, radius, value, displayCount, translateY]);
 
   return (
-    <View style={[defaultStyles.container]} {...panResponder.panHandlers}>
+    <View
+      style={[defaultStyles.container, theme.wheelPickerContainerStyle]}
+      {...panResponder.panHandlers}
+    >
       <View
         style={[
           defaultStyles.selectedIndicator,
@@ -128,6 +133,7 @@ const WheelWeb: React.FC<WheelProps> = ({
             transform: [{ translateY: -ITEM_HEIGHT / 2 }],
             height: ITEM_HEIGHT,
           },
+          theme.wheelPickerSelectedIndicatorStyle,
         ]}
       />
       {displayValues?.map((displayValue, index) => {
@@ -156,7 +162,9 @@ const WheelWeb: React.FC<WheelProps> = ({
               opacity: displayValue?.value !== value ? 0.3 : 1,
             }}
           >
-            <Text>{displayValue?.text}</Text>
+            <Text style={theme?.wheelPickerTextStyle}>
+              {displayValue?.text}
+            </Text>
           </Animated.View>
         );
       })}

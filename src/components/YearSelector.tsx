@@ -7,8 +7,8 @@ import {
   TextStyle,
   ViewStyle,
 } from 'react-native';
-import { useCalendarContext } from '../CalendarContext';
-import { getDateYear, getYearRange } from '../utils';
+import { useCalendarContext } from 'src/CalendarContext';
+import { getDateYear, getYearRange } from 'src/utils';
 
 const YearSelector: React.FC = () => {
   const { currentDate, currentYear, onSelectYear, theme } =
