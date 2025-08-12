@@ -1,5 +1,4 @@
 import React, { memo } from 'react';
-import { StyleSheet, Platform } from 'react-native';
 import WheelPicker from './WheelNativePicker';
 import { PickerOption } from '../../types';
 
@@ -19,7 +18,6 @@ const WheelNative: React.FC<WheelProps> = ({
       value={value}
       options={items}
       onChange={setValue}
-      containerStyle={defaultStyles.container}
       itemHeight={44}
       decelerationRate="fast"
     />
@@ -27,14 +25,3 @@ const WheelNative: React.FC<WheelProps> = ({
 };
 
 export default memo(WheelNative);
-
-const defaultStyles = StyleSheet.create({
-  container: {
-    display: 'flex',
-    ...Platform.select({
-      web: {
-        userSelect: 'none',
-      },
-    }),
-  },
-});

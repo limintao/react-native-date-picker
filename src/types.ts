@@ -47,8 +47,7 @@ export type CalendarThemeProps = {
   wheelPickerContainerStyle?: ViewStyle;
   wheelPickerItemStyle?: ViewStyle;
   wheelPickerTextStyle?: TextStyle;
-  wheelPickerIndicatorStyle?: ViewStyle;
-  wheelPickerDecelerationRate?: 'normal' | 'fast' | number;
+  wheelPickerSelectedIndicatorStyle?: ViewStyle;
   selectedRangeBackgroundColor?: string;
 };
 

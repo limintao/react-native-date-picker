@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useCalendarContext } from '../CalendarContext';
-import Wheel from './WheelPicker/Wheel';
 import { CONTAINER_HEIGHT } from '../enums';
 import {
   getFormatted,
@@ -10,6 +9,7 @@ import {
   getTimeRange,
   getDate,
 } from '../utils';
+import Wheel from './WheelPicker/Wheel';
 
 function createNumberList(start: number, end: number, first: number = 1) {
   return new Array(end - start).fill(0).map((_, index) => ({
@@ -90,30 +90,16 @@ const DatePicker: React.FC = () => {
     [currentDate, onSelectDate]
   );
 
-  const createIndicatorStyle = useCallback(
-    (index: number) => {
-      const len = columns?.length || 0;
-      if (!index && len > 1)
-        return { borderTopRightRadius: 0, borderBottomRightRadius: 0 };
-      else if (index === len - 1 && len > 1)
-        return { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 };
-      else if (len > 2) return { borderRadius: 0 };
-      else return undefined;
-    },
-    [columns]
-  );
-
   return (
     <View style={styles.container}>
       <View style={styles.datePickerContainer}>
-        {columns?.map((item, index) => (
+        {columns?.map((item) => (
           <View style={styles.wheelContainer} key={item}>
             {item === 'year' && (
               <Wheel
                 value={year}
                 items={years}
                 setValue={(value) => onSelectYear(value)}
-                indicatorStyle={createIndicatorStyle(index)}
               />
             )}
             {item === 'month' && (
@@ -121,7 +107,6 @@ const DatePicker: React.FC = () => {
                 value={month + 1}
                 items={months}
                 setValue={(value) => onSelectMonth(value - 1)}
-                indicatorStyle={createIndicatorStyle(index)}
               />
             )}
             {item === 'day' && (
@@ -129,7 +114,6 @@ const DatePicker: React.FC = () => {
                 value={getDate(currentDate).date()}
                 items={days}
                 setValue={(value) => handleChangeDate(value, 'date')}
-                indicatorStyle={createIndicatorStyle(index)}
               />
             )}
             {item === 'hour' && (
@@ -137,7 +121,6 @@ const DatePicker: React.FC = () => {
                 value={hour}
                 items={hours}
                 setValue={(value) => handleChangeDate(value, 'hour')}
-                indicatorStyle={createIndicatorStyle(index)}
               />
             )}
             {item === 'minute' && (
@@ -145,7 +128,6 @@ const DatePicker: React.FC = () => {
                 value={minute}
                 items={minutes}
                 setValue={(value) => handleChangeDate(value, 'minute')}
-                indicatorStyle={createIndicatorStyle(index)}
               />
             )}
             {item === 'second' && (
@@ -153,7 +135,6 @@ const DatePicker: React.FC = () => {
                 value={second}
                 items={seconds}
                 setValue={(value) => handleChangeDate(value, 'second')}
-                indicatorStyle={createIndicatorStyle(index)}
               />
             )}
           </View>

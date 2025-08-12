@@ -3,7 +3,6 @@ import {
   NativeSyntheticEvent,
   NativeScrollEvent,
   Animated,
-  ViewStyle,
   View,
   ViewProps,
   FlatListProps,
@@ -13,13 +12,13 @@ import {
 } from 'react-native';
 import WheelPickerItem from './wheel-picker-item';
 import { PickerOption } from '../../../types';
+import { useCalendarContext } from '../../../CalendarContext';
 
 interface Props {
   value: number | string;
   options: PickerOption[];
   onChange: (index: number | string) => void;
   itemHeight?: number;
-  containerStyle?: ViewStyle;
   containerProps?: Omit<ViewProps, 'style'>;
   scaleFunction?: (x: number) => number;
   rotationFunction?: (x: number) => number;
@@ -42,6 +41,7 @@ const WheelPicker: React.FC<Props> = ({
   containerProps = {},
   flatListProps = {},
 }) => {
+  const { theme } = useCalendarContext();
   const momentumStarted = useRef(false);
   const selectedIndex = options.findIndex((item) => item.value === value);
 
@@ -141,7 +141,11 @@ const WheelPicker: React.FC<Props> = ({
 
   return (
     <View
-      style={[styles.container, { height: containerHeight }]}
+      style={[
+        styles.container,
+        { height: containerHeight },
+        theme.wheelPickerContainerStyle,
+      ]}
       {...containerProps}
     >
       <View
@@ -151,6 +155,7 @@ const WheelPicker: React.FC<Props> = ({
             transform: [{ translateY: -itemHeight / 2 }],
             height: itemHeight,
           },
+          theme.wheelPickerSelectedIndicatorStyle,
         ]}
       />
       <Animated.FlatList
@@ -198,6 +203,7 @@ const WheelPicker: React.FC<Props> = ({
 
 const styles = StyleSheet.create({
   container: {
+    display: 'flex',
     position: 'relative',
   },
   selectedIndicator: {

@@ -2,7 +2,6 @@ import React, { useMemo, useCallback } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import dayjs from 'dayjs';
 import { useCalendarContext } from '../CalendarContext';
-import Day, { EmptyDay } from './Day';
 import {
   getParsedDate,
   getMonthDays,
@@ -13,6 +12,7 @@ import {
   getDate,
   getFormatted,
 } from '../utils';
+import Day, { EmptyDay } from './Day';
 
 const DaySelector: React.FC = () => {
   const {

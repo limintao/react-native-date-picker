@@ -1,9 +1,9 @@
 import React, { memo, useCallback } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { isEqual } from 'lodash';
 import { CalendarThemeProps, IDayObject } from '../types';
 import { CONTAINER_HEIGHT } from '../enums';
 import { addColorAlpha } from '../utils';
-import { isEqual } from 'lodash';
 
 export const daySize = 46;
 

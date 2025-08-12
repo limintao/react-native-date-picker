@@ -1,4 +1,10 @@
 import React, { memo, useCallback, useEffect, useReducer } from 'react';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import localeData from 'dayjs/plugin/localeData';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
+import 'dayjs/locale/zh-cn';
 import {
   getFormatted,
   getDate,
@@ -21,12 +27,6 @@ import type {
   MultiChange,
 } from './types';
 import Calendar from './components/Calendar';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import localeData from 'dayjs/plugin/localeData';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import localizedFormat from 'dayjs/plugin/localizedFormat';
-import 'dayjs/locale/zh-cn';
 
 dayjs.extend(utc);
 dayjs.extend(localeData);
