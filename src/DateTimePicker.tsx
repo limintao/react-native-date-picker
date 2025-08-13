@@ -206,7 +206,8 @@ const DateTimePicker: React.FC<
       type: CalendarActionKind.CHANGE_CURRENT_DATE,
       payload: currentDate,
     });
-  }, [mode, date, startDate, endDate, dates, minDate, timePicker, currentDate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, date, startDate, endDate, dates, minDate, timePicker]);
 
   const setCalendarView = useCallback((view: CalendarViews) => {
     dispatch({ type: CalendarActionKind.SET_CALENDAR_VIEW, payload: view });
