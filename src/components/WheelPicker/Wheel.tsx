@@ -6,7 +6,7 @@ import { PickerOption } from '../../types';
 
 interface WheelProps {
   value: number;
-  setValue?: (value: number) => void;
+  onChange?: (value: number) => void;
   items: Array<PickerOption>;
 }
 

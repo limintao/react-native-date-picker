@@ -9,7 +9,6 @@ import YearSelector from './YearSelector';
 import MonthSelector from './MonthSelector';
 import DaySelector from './DaySelector';
 import TimeSelector from './TimeSelector';
-import DatePicker from './DatePicker';
 
 const CalendarView: Record<CalendarViews, ReactNode> = {
   year: <YearSelector />,
@@ -29,7 +28,7 @@ const Calendar: React.FC<PropTypes> = ({
   height,
   containerStyle,
 }) => {
-  const { calendarView, mode } = useCalendarContext();
+  const { calendarView } = useCalendarContext();
 
   const styles = StyleSheet.create({
     container: {
@@ -43,15 +42,8 @@ const Calendar: React.FC<PropTypes> = ({
 
   return (
     <View style={[styles.container, containerStyle]}>
-      {mode !== 'wheel' && (
-        <Header
-          buttonPrevIcon={buttonPrevIcon}
-          buttonNextIcon={buttonNextIcon}
-        />
-      )}
-      <View style={styles.calendarContainer}>
-        {mode === 'wheel' ? <DatePicker /> : CalendarView[calendarView]}
-      </View>
+      <Header buttonPrevIcon={buttonPrevIcon} buttonNextIcon={buttonNextIcon} />
+      <View style={styles.calendarContainer}>{CalendarView[calendarView]}</View>
     </View>
   );
 };

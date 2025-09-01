@@ -4,20 +4,20 @@ import { PickerOption } from '../../types';
 
 interface WheelProps {
   value: number | string;
-  setValue?: (value: any) => void;
+  onChange?: (value: any) => void;
   items: PickerOption[];
 }
 
 const WheelNative: React.FC<WheelProps> = ({
   value,
-  setValue = () => {},
+  onChange = () => {},
   items,
 }) => {
   return (
     <WheelPicker
       value={value}
       options={items}
-      onChange={setValue}
+      onChange={onChange}
       itemHeight={44}
       decelerationRate="fast"
     />

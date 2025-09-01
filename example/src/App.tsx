@@ -204,7 +204,7 @@ export default function App() {
               displayFullDays
               timePicker={timePicker}
               // minDate={range.startDate}
-              maxDate={new Date('2025-02-18 00:00:00')}
+              maxDate={new Date()}
               // firstDayOfWeek={1}
               // columns={['year', 'month', 'day', 'hour', 'minute', 'second']}
               onChange={onChange}

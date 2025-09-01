@@ -17,14 +17,7 @@ export default function LocaleSelector({
 }: Props) {
   return (
     <View style={styles.localeContainer}>
-      <Text
-        style={{
-          // eslint-disable-next-line react-native/no-inline-styles
-          marginRight: 8,
-        }}
-      >
-        Locale:
-      </Text>
+      <Text style={{ marginRight: 8 }}>Locale:</Text>
       {Locales.map((item, index) => (
         <Pressable
           key={index}
@@ -41,7 +34,6 @@ export default function LocaleSelector({
           <Text
             style={[
               styles.localeButtonText,
-              // eslint-disable-next-line react-native/no-inline-styles
               item === locale && {
                 fontWeight: 'bold',
                 color: activeTextColor,

@@ -22,7 +22,7 @@ module.exports = [
       'prettier/prettier': 'warn',
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
-      'react-native/no-inline-styles': 'warn',
+      'react-native/no-inline-styles': 'off',
     },
     languageOptions: {
       parser: require('@typescript-eslint/parser'),

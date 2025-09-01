@@ -1,9 +1,8 @@
 import React, { memo, useCallback } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { isEqual } from 'lodash';
 import { CalendarThemeProps, IDayObject } from '../types';
 import { CONTAINER_HEIGHT } from '../enums';
-import { addColorAlpha } from '../utils';
+import { addColorAlpha, isEqual } from '../utils';
 
 export const daySize = 46;
 
@@ -97,7 +96,6 @@ const Day: React.FC<Props> = ({
         <View
           style={[
             style.rangeRoot,
-            // eslint-disable-next-line react-native/no-inline-styles
             {
               left: '50%',
               backgroundColor: rangeRootBackground,
@@ -110,7 +108,6 @@ const Day: React.FC<Props> = ({
         <View
           style={[
             style.rangeRoot,
-            // eslint-disable-next-line react-native/no-inline-styles
             {
               right: '50%',
               backgroundColor: rangeRootBackground,

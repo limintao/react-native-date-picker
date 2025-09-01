@@ -13,7 +13,7 @@ export type LocalState = {
   date: DateType;
   startDate: DateType;
   endDate: DateType;
-  dates: DateType[];
+  dates?: DateType[];
   calendarView: CalendarViews;
   currentDate: DateType; // used for latest state of calendar based on Month and Year
   currentYear: number;

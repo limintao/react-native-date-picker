@@ -300,3 +300,80 @@ export function addColorAlpha(color: string | undefined, opacity: number) {
 
   return color + opacityHex;
 }
+
+/**
+
+深度比较两个值是否相等
+@param {any} value
+@param {any} other
+@returns {boolean}
+*/
+export const isEqual = (value: any, other: any) => {
+  // 如果是同一个引用
+  if (value === other) {
+    // 排除 0 和 -0 的特殊情况
+    return value !== 0 || 1 / value === 1 / other;
+  }
+  // 如果有一个是 null/undefined，或者类型不同
+  if (value == null || other == null || typeof value !== typeof other) {
+    // 同时要特殊处理 NaN
+    return Number.isNaN(value) && Number.isNaN(other);
+  }
+
+  // 如果是对象或函数，则继续
+  if (typeof value === 'object' || typeof value === 'function') {
+    // Date
+    if (value instanceof Date && other instanceof Date) {
+      return value.getTime() === other.getTime();
+    }
+    // RegExp
+    if (value instanceof RegExp && other instanceof RegExp) {
+      return value.source === other.source && value.flags === other.flags;
+    }
+    // Array 或者普通对象
+    if (
+      (Array.isArray(value) && Array.isArray(other)) ||
+      (Object.prototype.toString.call(value) === '[object Object]' &&
+        Object.prototype.toString.call(other) === '[object Object]')
+    ) {
+      // 先比较键的数量是否一致
+      const valueKeys = Object.keys(value);
+      const otherKeys = Object.keys(other);
+      if (valueKeys.length !== otherKeys.length) {
+        return false;
+      }
+      // 递归比较每个键对应的值
+      for (const key of valueKeys) {
+        if (
+          !Object.prototype.hasOwnProperty.call(other, key) ||
+          !isEqual(value[key], other[key])
+        ) {
+          return false;
+        }
+      }
+      return true;
+    }
+  }
+
+  // 如果以上情况都不满足，则直接比较
+  return false;
+};
+
+export function throttle<T extends (...args: any[]) => any>(
+  func: T,
+  limit: number = 200
+): T {
+  let inThrottle = false;
+  let lastResult: any;
+
+  return ((...args: Parameters<T>) => {
+    if (!inThrottle) {
+      lastResult = func(...args);
+      inThrottle = true;
+      setTimeout(() => {
+        inThrottle = false;
+      }, limit);
+    }
+    return lastResult;
+  }) as T;
+}

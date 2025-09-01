@@ -15,7 +15,7 @@ import { sin } from './animated-math';
 
 interface WheelProps {
   value: number | string;
-  setValue?: (value: any) => void;
+  onChange?: (value: any) => void;
   items: PickerOption[];
 }
 
@@ -23,7 +23,7 @@ const ITEM_HEIGHT = 44;
 
 const WheelWeb: React.FC<WheelProps> = ({
   value,
-  setValue = () => {},
+  onChange = () => {},
   items,
 }) => {
   const { theme } = useCalendarContext();
@@ -65,15 +65,15 @@ const WheelWeb: React.FC<WheelProps> = ({
         if (newValue?.value === value) {
           translateY.setOffset(0);
           translateY.setValue(0);
-        } else if (newValue?.value) setValue(newValue.value);
-        else if (items[0]?.value) setValue(items[0].value);
+        } else if (newValue?.value) onChange(newValue.value);
+        else if (items[0]?.value) onChange(items[0].value);
       },
     });
   }, [
     circular,
     displayCount,
     radius,
-    setValue,
+    onChange,
     value,
     valueIndex,
     items,
@@ -141,7 +141,6 @@ const WheelWeb: React.FC<WheelProps> = ({
         return (
           <Animated.View
             key={`${displayValue?.text}-${index}`}
-            // eslint-disable-next-line react-native/no-inline-styles
             style={{
               position: 'absolute',
               height: ITEM_HEIGHT - 10,
@@ -203,7 +202,7 @@ const customComparator = (
 ) => {
   const areEqual =
     prev.value === next.value &&
-    prev.setValue === next.setValue &&
+    prev.onChange === next.onChange &&
     isEqual(prev.items, next.items);
 
   return areEqual;

@@ -35,7 +35,7 @@ const TimeSelector: React.FC = () => {
           <Wheel
             value={hour}
             items={hours}
-            setValue={(value) => handleChange(value, 'hour')}
+            onChange={(value) => handleChange(value, 'hour')}
           />
         </View>
         <Text
@@ -50,7 +50,7 @@ const TimeSelector: React.FC = () => {
           <Wheel
             value={minute}
             items={minutes}
-            setValue={(value) => handleChange(value, 'minute')}
+            onChange={(value) => handleChange(value, 'minute')}
           />
         </View>
         <Text
@@ -65,7 +65,7 @@ const TimeSelector: React.FC = () => {
           <Wheel
             value={second}
             items={seconds}
-            setValue={(value) => handleChange(value, 'second')}
+            onChange={(value) => handleChange(value, 'second')}
           />
         </View>
       </View>
