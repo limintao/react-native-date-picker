@@ -82,7 +82,7 @@ const WheelPicker: React.FC<Props> = ({
         onChange(value);
         clearTimeout(timerRef.current!);
         timerRef.current = undefined;
-      }, 100);
+      }, 50);
     }
   };
 
@@ -144,6 +144,7 @@ const WheelPicker: React.FC<Props> = ({
         scrollEventThrottle={16}
         onScroll={scrollEvent}
         snapToOffsets={offsets}
+        onMomentumScrollEnd={handleScrollEnd}
         decelerationRate={decelerationRate}
         initialScrollIndex={selectedIndex}
         getItemLayout={(_, index) => ({
