@@ -39,8 +39,8 @@ const WheelPicker: React.FC<Props> = ({
   containerProps = {},
 }) => {
   const { theme } = useCalendarContext();
+  const momentumStarted = useRef(false);
   const selectedIndex = options.findIndex((item) => item.value === value);
-  const timerRef = useRef<NodeJS.Timeout>();
 
   const flatListRef = useRef<FlatList>(null);
   const [scrollY] = useState(new Animated.Value(selectedIndex * itemHeight));
@@ -66,7 +66,6 @@ const WheelPicker: React.FC<Props> = ({
   );
 
   const handleScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    if (timerRef.current) clearTimeout(timerRef.current);
     const offsetY = Math.min(
       itemHeight * (options.length - 1),
       Math.max(event.nativeEvent.contentOffset.y, 0)
@@ -78,19 +77,47 @@ const WheelPicker: React.FC<Props> = ({
     }
     const value = options[index]?.value || 0;
     if (index !== selectedIndex) {
-      timerRef.current = setTimeout(() => {
-        onChange(value);
-        clearTimeout(timerRef.current!);
-        timerRef.current = undefined;
-      }, 50);
+      onChange(value);
     }
+  };
+
+  const handleMomentumScrollBegin = () => {
+    momentumStarted.current = true;
+  };
+
+  const handleMomentumScrollEnd = (
+    event: NativeSyntheticEvent<NativeScrollEvent>
+  ) => {
+    momentumStarted.current = false;
+    handleScrollEnd(event);
+  };
+
+  const handleScrollEndDrag = (
+    event: NativeSyntheticEvent<NativeScrollEvent>
+  ) => {
+    // Capture the offset value immediately
+    const offsetY = event.nativeEvent.contentOffset?.y;
+
+    // We'll start a short timer to see if momentum scroll begins
+    setTimeout(() => {
+      // If momentum scroll hasn't started within the timeout,
+      // then it was a slow scroll that won't trigger momentum
+      if (!momentumStarted.current && offsetY !== undefined) {
+        // Create a synthetic event with just the data we need
+        const syntheticEvent = {
+          nativeEvent: {
+            contentOffset: { y: offsetY },
+          },
+        };
+        handleScrollEnd(syntheticEvent as any);
+      }
+    }, 50);
   };
 
   const scrollEvent = useMemo(
     () =>
       Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
         useNativeDriver: true,
-        listener: handleScrollEnd,
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
@@ -144,7 +171,9 @@ const WheelPicker: React.FC<Props> = ({
         scrollEventThrottle={16}
         onScroll={scrollEvent}
         snapToOffsets={offsets}
-        onMomentumScrollEnd={handleScrollEnd}
+        onScrollEndDrag={handleScrollEndDrag}
+        onMomentumScrollBegin={handleMomentumScrollBegin}
+        onMomentumScrollEnd={handleMomentumScrollEnd}
         decelerationRate={decelerationRate}
         initialScrollIndex={selectedIndex}
         getItemLayout={(_, index) => ({
@@ -152,6 +181,7 @@ const WheelPicker: React.FC<Props> = ({
           offset: itemHeight * index,
           index,
         })}
+        maxToRenderPerBatch={20}
         data={paddedOptions}
         keyExtractor={(item, index) =>
           item ? `${item.value}-${item.text}-${index}` : `-${index}`
