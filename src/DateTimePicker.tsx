@@ -217,7 +217,7 @@ const DateTimePicker: React.FC<
             currentDate: selectDate,
           };
         case CalendarActionKind.CHANGE_SELECTED_RANGE:
-          const { start, end } = action.payload;
+          const { startDate: start, endDate: end } = action.payload;
           return {
             ...prevState,
             startDate: start,
@@ -311,15 +311,18 @@ const DateTimePicker: React.FC<
       } else if (mode === 'range') {
         const sd = stateRef.current.startDate;
         const ed = stateRef.current.endDate;
-        let isStart: boolean = true;
 
-        if (sd && !ed && dateToUnix(datetime) >= dateToUnix(sd!))
-          isStart = false;
-
-        const newDateRang = {
-          startDate: isStart ? getStartOfDay(datetime) : sd,
-          endDate: !isStart ? getEndOfDay(datetime) : undefined,
+        let newDateRang: Parameters<RangeChange>[0] = {
+          startDate: getStartOfDay(datetime),
+          endDate: undefined,
         };
+        if (sd && !ed) {
+          if (dateToUnix(datetime) >= dateToUnix(sd!)) {
+            newDateRang = { startDate: sd, endDate: getEndOfDay(datetime) };
+          } else {
+            newDateRang = { startDate: getStartOfDay(datetime), endDate: sd };
+          }
+        }
 
         dispatch({
           type: CalendarActionKind.CHANGE_SELECTED_RANGE,
