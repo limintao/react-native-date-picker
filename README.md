@@ -73,16 +73,17 @@ const styles = StyleSheet.create({
 
 ## Calendar props
 
-| Name            | Type       | Default       | Description                                                       |
-| --------------- | ---------- | ------------- | ----------------------------------------------------------------- |
-| mode            | `string`   | `'single'`    | 定义 DatePicker 的模式 `['single', 'range', 'multiple', 'wheel']`   |
-| locale          | `string`   | `'zh-cn'`     | 定义 DatePicker 的语言环境，使用其他语言需要从dayjs引入语言包            |
-| minDate         | `DateType` | `null`        | 定义 DatePicker 的最小可选日期                                       |
-| maxDate         | `DateType` | `null`        | 定义 DatePicker 的最大可选日期                                       |
-| firstDayOfWeek  | `number`   | `0`           | 定义一周的起始日，范围为 0-6，其中 0 表示星期天，6 表示星期六              |
-| displayFullDays | `boolean`  | `false`       | 定义是否在当前日历视图中显示上个月和下个月的日期                          |
-| initialView     | `string`   | `'day'`       | 定义 DatePicker 的初始视图 `['day', 'month', 'year', 'time']`       |
-| height          | `number`   | `'undefined'` | 定义日历视图的高度                                                   |
+| Name            | Type       | Default                 | Description                                                       |
+| --------------- | ---------- | ----------------------- | ----------------------------------------------------------------- |
+| mode            | `string`   | `'single'`              | 定义 DatePicker 的模式 `['single', 'range', 'multiple', 'wheel']` |
+| locale          | `string`   | `'zh-cn'`               | 定义 DatePicker 的语言环境，使用其他语言需要从dayjs引入语言包     |
+| minDate         | `DateType` | `null`                  | 定义 DatePicker 的最小可选日期                                    |
+| maxDate         | `DateType` | `null`                  | 定义 DatePicker 的最大可选日期                                    |
+| firstDayOfWeek  | `number`   | `0`                     | 定义一周的起始日，范围为 0-6，其中 0 表示星期天，6 表示星期六     |
+| displayFullDays | `boolean`  | `false`                 | 定义是否在当前日历视图中显示上个月和下个月的日期                  |
+| initialView     | `string`   | `'day'`                 | 定义 DatePicker 的初始视图 `['day', 'month', 'year', 'time']`     |
+| height          | `number`   | `'undefined'`           | 定义日历视图的高度                                                |
+| format          | `string`   | `'YYYY/MM/DD HH:mm:ss'` | 设置日期格式                                                      |
 
 <p align="center">
 <img src="/screenshot/modes-screenshot.png" />

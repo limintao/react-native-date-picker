@@ -25,6 +25,7 @@ export type CalendarAction = {
 };
 
 export type CalendarThemeProps = {
+  format?: string;
   containerStyle?: ViewStyle;
   headerButtonsPosition?: HeaderButtonPositions;
   headerContainerStyle?: ViewStyle;

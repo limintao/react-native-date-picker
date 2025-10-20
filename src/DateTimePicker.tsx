@@ -13,7 +13,6 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import 'dayjs/locale/zh-cn';
 import {
-  getFormatted,
   dateToUnix,
   getEndOfDay,
   getStartOfDay,
@@ -100,6 +99,7 @@ const DateTimePicker: React.FC<
     startDate,
     endDate,
     dates,
+    format = 'YYYY-MM-DD HH:mm:ss',
     onChange,
     initialView = 'day',
     height,
@@ -306,21 +306,27 @@ const DateTimePicker: React.FC<
         });
 
         (onChange as SingleChange)?.({
-          date: newDate,
+          date: dayjs(newDate).format(format),
         });
       } else if (mode === 'range') {
         const sd = stateRef.current.startDate;
         const ed = stateRef.current.endDate;
 
         let newDateRang: Parameters<RangeChange>[0] = {
-          startDate: getStartOfDay(datetime),
+          startDate: getStartOfDay(datetime).format(format),
           endDate: undefined,
         };
         if (sd && !ed) {
           if (dateToUnix(datetime) >= dateToUnix(sd!)) {
-            newDateRang = { startDate: sd, endDate: getEndOfDay(datetime) };
+            newDateRang = {
+              startDate: dayjs(sd).format(format),
+              endDate: getEndOfDay(datetime).format(format),
+            };
           } else {
-            newDateRang = { startDate: getStartOfDay(datetime), endDate: sd };
+            newDateRang = {
+              startDate: getStartOfDay(datetime).format(format),
+              endDate: dayjs(sd).format(format),
+            };
           }
         }
 
@@ -343,8 +349,8 @@ const DateTimePicker: React.FC<
         newDates.sort((a, b) => (dayjs(a).isAfter(dayjs(b)) ? 1 : -1));
 
         const newDatesObj = {
-          dates: newDates,
-          datePressed: newDate,
+          dates: newDates.map((d) => dayjs(d).format(format)),
+          datePressed: newDate.format(format),
           change: (exists
             ? 'removed'
             : 'added') as Parameters<MultiChange>[0]['change'],
@@ -363,11 +369,11 @@ const DateTimePicker: React.FC<
         });
 
         (onChange as SingleChange)?.({
-          date: datetime,
+          date: dayjs(datetime).format(format),
         });
       }
     },
-    [onChange, mode, timePicker]
+    [format, mode, timePicker, onChange]
   );
 
   const onSelectMonth = useCallback(
@@ -381,9 +387,9 @@ const DateTimePicker: React.FC<
       });
       if (mode !== 'wheel') setCalendarView('day');
       if (mode === 'single' || mode === 'wheel')
-        (onChange as SingleChange)?.({ date: getFormatted(newDate) });
+        (onChange as SingleChange)?.({ date: newDate.format(format) });
     },
-    [maxDate, minDate, mode, onChange, setCalendarView]
+    [format, maxDate, minDate, mode, onChange, setCalendarView]
   );
 
   const onSelectYear = useCallback(
@@ -397,9 +403,9 @@ const DateTimePicker: React.FC<
       });
       if (mode !== 'wheel') setCalendarView('day');
       if (mode === 'single' || mode === 'wheel')
-        (onChange as SingleChange)?.({ date: getFormatted(newDate) });
+        (onChange as SingleChange)?.({ date: newDate.format(format) });
     },
-    [maxDate, minDate, mode, setCalendarView, onChange]
+    [format, maxDate, minDate, mode, setCalendarView, onChange]
   );
 
   const onChangeMonth = useCallback((month: number) => {

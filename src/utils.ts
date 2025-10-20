@@ -154,11 +154,11 @@ export function getFirstDayOfMonth(
   return d.date(1 - firstDayOfWeek).day();
 }
 
-export function getStartOfDay(date: DateType): DateType {
+export function getStartOfDay(date: DateType): dayjs.Dayjs {
   return dayjs(date).startOf('day');
 }
 
-export function getEndOfDay(date: DateType): DateType {
+export function getEndOfDay(date: DateType): dayjs.Dayjs {
   return dayjs(date).endOf('day');
 }
 
