@@ -12,12 +12,7 @@ import localeData from 'dayjs/plugin/localeData';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import 'dayjs/locale/zh-cn';
-import {
-  dateToUnix,
-  getEndOfDay,
-  getStartOfDay,
-  areDatesOnSameDay,
-} from './utils';
+import { getEndOfDay, getStartOfDay, areDatesOnSameDay } from './utils';
 import CalendarContext from './CalendarContext';
 import { CalendarViews, CalendarActionKind } from './enums';
 import type {
@@ -311,23 +306,22 @@ const DateTimePicker: React.FC<
       } else if (mode === 'range') {
         const sd = stateRef.current.startDate;
         const ed = stateRef.current.endDate;
+        const newDate = dayjs(datetime);
 
         let newDateRang: Parameters<RangeChange>[0] = {
-          startDate: getStartOfDay(datetime).format(format),
-          endDate: undefined,
+          startDate: getStartOfDay(sd || newDate).format(format),
+          endDate: ed ? getEndOfDay(ed).format(format) : undefined,
         };
-        if (sd && !ed) {
-          if (dateToUnix(datetime) >= dateToUnix(sd!)) {
-            newDateRang = {
-              startDate: dayjs(sd).format(format),
-              endDate: getEndOfDay(datetime).format(format),
-            };
-          } else {
-            newDateRang = {
-              startDate: getStartOfDay(datetime).format(format),
-              endDate: dayjs(sd).format(format),
-            };
-          }
+        if (newDate.isSame(sd, 'date') || newDate.isSame(ed, 'date') || !sd) {
+          newDateRang.endDate = undefined;
+          newDateRang.startDate = getStartOfDay(newDate).format(format);
+        } else if (newDate.isAfter(sd)) {
+          if (ed && newDate.isBefore(ed))
+            newDateRang.startDate = getStartOfDay(newDate).format(format);
+          else newDateRang.endDate = getEndOfDay(newDate).format(format);
+        } else {
+          newDateRang.startDate = getStartOfDay(newDate).format(format);
+          if (!ed) newDateRang.endDate = getEndOfDay(sd).format(format);
         }
 
         dispatch({

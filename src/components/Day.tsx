@@ -57,15 +57,15 @@ const Day: React.FC<Props> = ({
   const todayItemStyle = isToday
     ? {
         borderWidth: 2,
-        borderColor: selectedItemColor || '#0047FF',
+        borderColor: selectedItemColor,
         ...todayContainerStyle,
       }
     : null;
 
   const activeItemStyle = isSelected
     ? {
-        borderColor: selectedItemColor || '#0047FF',
-        backgroundColor: selectedItemColor || '#0047FF',
+        borderColor: selectedItemColor,
+        backgroundColor: selectedItemColor,
       }
     : null;
 
@@ -74,13 +74,13 @@ const Day: React.FC<Props> = ({
     : isToday
     ? {
         ...calendarTextStyle,
-        color: selectedItemColor || '#0047FF',
+        color: selectedItemColor,
         ...todayTextStyle,
       }
     : calendarTextStyle;
 
   const rangeRootBackground =
-    selectedRangeBackgroundColor ?? addColorAlpha(selectedItemColor, 0.15);
+    selectedRangeBackgroundColor ?? addColorAlpha(selectedItemColor!, 0.15);
 
   const style = styles(height || CONTAINER_HEIGHT);
 
@@ -141,7 +141,9 @@ const styles = (height: number) =>
   StyleSheet.create({
     dayCell: {
       position: 'relative',
-      width: '14.2%',
+      flexBasis: '14.285714%',
+      flexGrow: 0,
+      flexShrink: 0,
       height: height / 7,
     },
     dayContainer: {

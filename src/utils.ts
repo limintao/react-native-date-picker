@@ -53,7 +53,7 @@ export function isDateBetween(
 ): boolean {
   if (!startDate || !endDate) return false;
 
-  return dayjs(date) <= endDate && dayjs(date) >= startDate;
+  return dayjs(date) <= dayjs(endDate) && dayjs(date) >= dayjs(startDate);
 }
 
 export const getFormattedDate = (date: DateType, format: string) =>
@@ -285,25 +285,8 @@ const generateDayObject = (
   };
 };
 
-export function addColorAlpha(color: string | undefined, opacity: number) {
-  //if it has an alpha, remove it
-  if (!color) color = '#000000';
-
-  if (color.length > 7) color = color.substring(0, color.length - 2);
-
-  // coerce values so ti is between 0 and 1.
-  const _opacity = Math.round(Math.min(Math.max(opacity, 0), 1) * 255);
-  let opacityHex = _opacity.toString(16).toUpperCase();
-
-  // opacities near 0 need a trailing 0
-  if (opacityHex.length === 1) opacityHex = '0' + opacityHex;
-
-  return color + opacityHex;
-}
-
 /**
-
-深度比较两个值是否相等
+** 深度比较两个值是否相等
 @param {any} value
 @param {any} other
 @returns {boolean}
@@ -359,21 +342,68 @@ export const isEqual = (value: any, other: any) => {
   return false;
 };
 
-export function throttle<T extends (...args: any[]) => any>(
-  func: T,
-  limit: number = 200
-): T {
-  let inThrottle = false;
-  let lastResult: any;
+/**
+ ** Adds alpha channel to a color string.
+ ** Supports hex, rgb, rgba, hsl, hsla color formats.
+ * @param {string} color - The color string.
+ * @param {number} alpha - The alpha value (0-1).
+ * @returns {string} The color string with alpha channel.
+ * @throws {Error} If the color format is not supported.
+ */
+export const addColorAlpha = (color: string, alpha: number = 1): string => {
+  const a = clamp01(alpha);
+  const input = color.trim();
 
-  return ((...args: Parameters<T>) => {
-    if (!inThrottle) {
-      lastResult = func(...args);
-      inThrottle = true;
-      setTimeout(() => {
-        inThrottle = false;
-      }, limit);
+  // hex: #RGB/#RRGGBB
+  const hexMatch = input.match(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/);
+  if (hexMatch?.[1]) {
+    const hex = hexMatch[1];
+    let r: number, g: number, b: number;
+
+    if (hex.length === 3) {
+      r = parseInt(hex.charAt(0) + hex.charAt(0), 16);
+      g = parseInt(hex.charAt(1) + hex.charAt(1), 16);
+      b = parseInt(hex.charAt(2) + hex.charAt(2), 16);
+    } else {
+      r = parseInt(hex.slice(0, 2), 16);
+      g = parseInt(hex.slice(2, 4), 16);
+      b = parseInt(hex.slice(4, 6), 16);
     }
-    return lastResult;
-  }) as T;
+
+    return toHex8(r, g, b, a); // #RRGGBBAA
+  }
+
+  // rgb / rgba
+  const rgbMatch = input.match(/^rgba?\((.*)\)$/i);
+  if (rgbMatch?.[1]) {
+    const parts = rgbMatch[1].split(',').map((s) => s.trim());
+    if (parts.length < 3) throw new Error('Invalid rgb/rgba color');
+    const [r, g, b] = parts;
+    return `rgba(${r}, ${g}, ${b}, ${a})`; // rgba(r, g, b, alpha)[web:18]
+  }
+
+  // hsl / hsla
+  const hslMatch = input.match(/^hsla?\((.*)\)$/i);
+  if (hslMatch?.[1]) {
+    const parts = hslMatch[1].split(',').map((s) => s.trim());
+    if (parts.length < 3) throw new Error('Invalid hsl/hsla color');
+    const [h, s, l] = parts;
+    return `hsla(${h}, ${s}, ${l}, ${a})`; // hsla(h, s, l, alpha)[web:22][web:30]
+  }
+
+  throw new Error(`Unsupported color format: ${color}`);
+};
+
+function clamp01(n: number): number {
+  if (!Number.isFinite(n)) return 1;
+  return Math.min(1, Math.max(0, n));
+}
+
+function toHex2(n: number): string {
+  return Math.round(n).toString(16).padStart(2, '0').toUpperCase();
+}
+
+function toHex8(r: number, g: number, b: number, alpha01: number): string {
+  const aa = toHex2(alpha01 * 255);
+  return `#${toHex2(r)}${toHex2(g)}${toHex2(b)}${aa}`;
 }
