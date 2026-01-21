@@ -431,7 +431,7 @@ const DateTimePicker: React.FC<
       displayFullDays,
       firstDayOfWeek: firstDay,
       height,
-      theme: rest,
+      theme: { selectedItemColor: '#0047FF', ...rest },
     }),
     [
       columns,

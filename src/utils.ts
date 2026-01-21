@@ -350,7 +350,10 @@ export const isEqual = (value: any, other: any) => {
  * @returns {string} The color string with alpha channel.
  * @throws {Error} If the color format is not supported.
  */
-export const addColorAlpha = (color: string, alpha: number = 1): string => {
+export const addColorAlpha = (
+  color: string = '#0047FF',
+  alpha: number = 1
+): string => {
   const a = clamp01(alpha);
   const input = color.trim();
 

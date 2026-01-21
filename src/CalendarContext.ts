@@ -22,9 +22,7 @@ export interface CalendarContextType extends DatePickerBaseProps {
   onChangeYear: (value: number) => void;
 }
 
-const CalendarContext = createContext({
-  theme: { selectedItemColor: '#0047FF' },
-} as CalendarContextType);
+const CalendarContext = createContext({} as CalendarContextType);
 
 export const useCalendarContext = () => useContext(CalendarContext);
 
