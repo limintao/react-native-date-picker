@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import { memo } from 'react';
 import WheelPicker from './WheelNativePicker';
 import { PickerOption } from '../../types';
 

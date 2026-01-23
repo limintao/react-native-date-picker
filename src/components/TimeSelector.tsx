@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import { useCalendarContext } from '../CalendarContext';
 import { CONTAINER_HEIGHT } from '../enums';

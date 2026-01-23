@@ -1,4 +1,4 @@
-import React, { memo, useCallback } from 'react';
+import { memo, useCallback } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { CalendarThemeProps, IDayObject } from '../types';
 import { CONTAINER_HEIGHT } from '../enums';

@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { Platform } from 'react-native';
 import WheelNative from './WheelNative';
 import WheelWeb from './WheelWeb';

@@ -1,4 +1,4 @@
-import React, { ReactNode, memo } from 'react';
+import { ReactNode, memo } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { CONTAINER_HEIGHT } from '../enums';
 import { useCalendarContext } from '../CalendarContext';

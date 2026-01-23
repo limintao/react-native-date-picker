@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useRef } from 'react';
+import { memo, useMemo, useRef } from 'react';
 import {
   Animated,
   PanResponder,
@@ -7,7 +7,7 @@ import {
   Platform,
   Text,
 } from 'react-native';
-import { isEqual } from 'lodash';
+import { isEqual } from '../../utils';
 import { CONTAINER_HEIGHT } from '../../enums';
 import { PickerOption } from '../../types';
 import { useCalendarContext } from '../../CalendarContext';

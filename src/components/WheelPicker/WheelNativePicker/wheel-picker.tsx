@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState, memo } from 'react';
+import { useEffect, useMemo, useRef, useState, memo } from 'react';
 import {
   NativeSyntheticEvent,
   NativeScrollEvent,

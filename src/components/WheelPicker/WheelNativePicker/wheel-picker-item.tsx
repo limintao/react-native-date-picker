@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { Animated, Text, StyleSheet } from 'react-native';
 import { useCalendarContext } from '../../../CalendarContext';
 import { PickerOption } from '../../../types';
