@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import { useCalendarContext } from '../CalendarContext';
 import { CONTAINER_HEIGHT } from '../enums';
-import { getParsedDate, getDate, getFormatted } from '../utils';
+import { getParsedDate } from '../utils';
 import Wheel from './WheelPicker/Wheel';
 
 function createNumberList(num: number) {
@@ -17,15 +17,14 @@ const minutes = createNumberList(60);
 const seconds = createNumberList(60);
 
 const TimeSelector: React.FC = () => {
-  const { date, onSelectDate, theme } = useCalendarContext();
-  const { hour, minute, second } = getParsedDate(date);
+  const { date, currentDate, onSelectDatePart, theme } = useCalendarContext();
+  const { hour, minute, second } = getParsedDate(date ?? currentDate);
 
   const handleChange = useCallback(
     (value: number, type: 'hour' | 'minute' | 'second') => {
-      const newDate = getDate(date)[type](value);
-      onSelectDate(getFormatted(newDate));
+      onSelectDatePart(type, value);
     },
-    [date, onSelectDate]
+    [onSelectDatePart]
   );
 
   return (

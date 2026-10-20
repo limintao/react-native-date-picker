@@ -69,26 +69,39 @@ export interface IDayObject {
   rightCrop: boolean;
 }
 
-export type SingleChange = (params: { date: DateType }) => void;
+export type OrderedDateParts =
+  'year' | 'month' | 'day' | 'hour' | 'minute' | 'second';
 
-export type RangeChange = (params: {
+export type SingleChangeParams = {
+  mode: 'single' | 'wheel';
+  date: DateType;
+};
+
+export type RangeChangeParams = {
+  mode: 'range';
   startDate: DateType;
   endDate: DateType;
-}) => any;
+};
 
-export type MultiChange = (params: {
+export type MultiChangeParams = {
+  mode: 'multiple';
   dates: DateType[];
   datePressed: DateType;
   change: 'added' | 'removed';
-}) => any;
+};
 
-export type OrderedDateParts =
-  | 'year'
-  | 'month'
-  | 'day'
-  | 'hour'
-  | 'minute'
-  | 'second';
+export type DatePickerChangeParams =
+  SingleChangeParams | RangeChangeParams | MultiChangeParams;
+
+// 各模式专用回调
+export type SingleChange = (params: SingleChangeParams) => void;
+
+export type RangeChange = (params: RangeChangeParams) => void;
+
+export type MultiChange = (params: MultiChangeParams) => void;
+
+// 一个函数统一处理所有模式
+export type DatePickerChange = (params: DatePickerChangeParams) => void;
 
 export interface DatePickerBaseProps {
   mode?: ModeType;
@@ -105,7 +118,7 @@ export interface DatePickerBaseProps {
   dates?: DateType[];
   startDate?: DateType;
   endDate?: DateType;
-  onChange?: SingleChange | RangeChange | MultiChange;
+  onChange?: DatePickerChange;
   initialView?: CalendarViews;
   height?: number;
 }

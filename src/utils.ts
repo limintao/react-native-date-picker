@@ -33,7 +33,7 @@ export const getDateYear = (date: DateType) => dayjs(date).year();
 export const getToday = () => dayjs().format(DATE_FORMAT);
 
 export function areDatesOnSameDay(a: DateType, b: DateType) {
-  if (!a || !b) return false;
+  if (a == null || b == null) return false;
 
   const date_a = dayjs(a).format(DATE_FORMAT);
   const date_b = dayjs(b).format(DATE_FORMAT);
@@ -51,15 +51,40 @@ export function isDateBetween(
     endDate?: DateType;
   }
 ): boolean {
-  if (!startDate || !endDate) return false;
+  if (startDate == null || endDate == null) return false;
 
-  return dayjs(date) <= dayjs(endDate) && dayjs(date) >= dayjs(startDate);
+  return (
+    !dayjs(date).isBefore(dayjs(startDate), 'day') &&
+    !dayjs(date).isAfter(dayjs(endDate), 'day')
+  );
 }
 
 export const getFormattedDate = (date: DateType, format: string) =>
   dayjs(date).format(format);
 
-export const getDate = (date: DateType) => dayjs(date, DATE_FORMAT);
+export const getDate = (date: DateType) => dayjs(date);
+
+export function clampDate(
+  date: DateType,
+  min?: DateType,
+  max?: DateType
+): dayjs.Dayjs {
+  let result = dayjs(date ?? undefined);
+  const lower = min == null ? null : dayjs(min);
+  const upper = max == null ? null : dayjs(max);
+  if (
+    !result.isValid() ||
+    (lower && !lower.isValid()) ||
+    (upper && !upper.isValid())
+  ) {
+    throw new Error('Invalid date or date boundary');
+  }
+  if (lower && upper && lower.isAfter(upper))
+    throw new Error('minDate must not exceed maxDate');
+  if (lower && result.isBefore(lower)) result = lower;
+  if (upper && result.isAfter(upper)) result = upper;
+  return result;
+}
 
 export const getYearRange = (year: number) => {
   const endYear = YEAR_PAGE_SIZE * Math.ceil(year / YEAR_PAGE_SIZE);
@@ -118,8 +143,8 @@ export function getDaysNumInMonth(
       `${year}-${formattedMonth}-${String(day).padStart(2, '0')}`
     );
     if (
-      (currentDate.isAfter(minDay) || currentDate.isSame(minDay, 'day')) &&
-      (currentDate.isBefore(maxDay) || currentDate.isSame(maxDay, 'day'))
+      (minDate == null || !currentDate.isBefore(minDay, 'day')) &&
+      (maxDate == null || !currentDate.isAfter(maxDay, 'day'))
     )
       daysArray.push({ value: day, text: String(day).padStart(2, '0') });
   }
@@ -132,17 +157,13 @@ export function getTimeRange(
   max: DateType,
   type: 'hour' | 'minute' | 'second'
 ) {
-  const formatStr = `YYYY-MM-DD${
-    type === 'minute' ? ' HH' : type === 'second' ? ' HH:mm' : ''
-  }`;
-  const current = getDate(date).format(formatStr);
-  const minDate = getDate(min).format(formatStr);
-  const maxDate = getDate(max).format(formatStr);
-
+  const current = getDate(date);
+  const unit = type === 'hour' ? 'day' : type === 'minute' ? 'hour' : 'minute';
   const range: [number, number] = [0, type === 'hour' ? 24 : 60];
-  if (current <= minDate) range[0] = getDate(min)[type]();
-  if (current >= maxDate) range[1] = getDate(max)[type]() + 1;
-
+  if (min != null && current.isSame(getDate(min), unit))
+    range[0] = getDate(min)[type]();
+  if (max != null && current.isSame(getDate(max), unit))
+    range[1] = getDate(max)[type]() + 1;
   return range;
 }
 
@@ -271,9 +292,10 @@ const generateDayObject = (
   dayOfMonth: number
 ) => {
   let disabled = false;
-  if (minDate) disabled = date < getDate(minDate);
+  if (minDate != null) disabled = date.isBefore(getDate(minDate), 'day');
 
-  if (maxDate && !disabled) disabled = date > getDate(maxDate);
+  if (maxDate != null && !disabled)
+    disabled = date.isAfter(getDate(maxDate), 'day');
 
   return {
     text: day.toString(),

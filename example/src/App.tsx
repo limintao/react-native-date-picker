@@ -10,7 +10,8 @@ import {
 } from 'react-native';
 import ThemeSelector, { ITheme } from './components/ThemeSelector';
 import LocaleSelector from './components/LocaleSelector';
-import DateTimePicker, { DateType, ModeType } from 'react-native-dates-picker';
+import DateTimePicker from 'react-native-dates-picker';
+import type { DateType, ModeType, DatePickerChange } from 'react-native-dates-picker';
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
 import 'dayjs/locale/en';
@@ -52,11 +53,11 @@ export default function App() {
     [setMode, setDate, setRange, setDates]
   );
 
-  const onChange = useCallback(
+  const onChange = useCallback<DatePickerChange>(
     (params) => {
-      if (mode === 'single' || mode === 'wheel') setDate(params.date);
-      else if (mode === 'range') setRange(params);
-      else if (mode === 'multiple') setDates(params.dates);
+      if (params.mode === 'single' || params.mode === 'wheel') setDate(params.date);
+      else if (params.mode === 'range') setRange(params);
+      else if (params.mode === 'multiple') setDates(params.dates);
     },
     [mode]
   );

@@ -1,18 +1,17 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useMemo } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useCalendarContext } from '../CalendarContext';
 import {
-  getFormatted,
   getParsedDate,
   getDaysNumInMonth,
   getTimeRange,
-  getDate,
+  clampDate,
 } from '../utils';
 import Wheel from './WheelPicker/Wheel';
 import { OrderedDateParts } from '../types';
 
 function createNumberList(start: number, end: number, first: number = 1) {
-  return new Array(end - start).fill(0).map((_, index) => ({
+  return new Array(Math.max(0, end - start)).fill(0).map((_, index) => ({
     value: index + first + start,
     text: String(index + first + start).padStart(2, '0'),
   }));
@@ -24,26 +23,28 @@ interface WheelSelectorProps {
 
 const WheelSelector: React.FC<WheelSelectorProps> = ({ type }) => {
   const {
-    date,
     currentDate,
     onSelectYear,
     onSelectMonth,
-    onSelectDate,
-    minDate = '1900-01-01',
-    maxDate = '2099-12-31',
+    onSelectDatePart,
+    minDate: minBoundary,
+    maxDate: maxBoundary,
   } = useCalendarContext();
-  const latestValues = useRef({ date, currentDate });
-  const { year, month } = useMemo(() => {
-    const cd = getDate(currentDate);
-    if (cd.isAfter(getDate(maxDate))) return getParsedDate(maxDate);
-    if (cd.isBefore(getDate(minDate))) return getParsedDate(minDate);
-    return getParsedDate(cd);
-  }, [currentDate, maxDate, minDate]);
+  const minDate = minBoundary ?? '1900-01-01 00:00:00';
+  const maxDate = maxBoundary ?? '2099-12-31 23:59:59.999';
+  const effectiveDate = useMemo(
+    () => clampDate(currentDate, minDate, maxDate),
+    [currentDate, minDate, maxDate]
+  );
+  const { year, month } = getParsedDate(effectiveDate);
 
   const { year: startYear, month: startMonth } = getParsedDate(minDate);
   const { year: endYear, month: endMonth } = getParsedDate(maxDate);
-  const { hour, minute, second } = getParsedDate(currentDate);
-  const years = createNumberList(startYear - 1, endYear);
+  const { hour, minute, second } = getParsedDate(effectiveDate);
+  const years = useMemo(
+    () => createNumberList(startYear - 1, endYear),
+    [startYear, endYear]
+  );
   const months = useMemo(
     () =>
       createNumberList(
@@ -60,36 +61,32 @@ const WheelSelector: React.FC<WheelSelectorProps> = ({ type }) => {
   const hours = useMemo(
     () =>
       createNumberList(
-        ...getTimeRange(currentDate, minDate, maxDate, 'hour'),
+        ...getTimeRange(effectiveDate, minDate, maxDate, 'hour'),
         0
       ),
-    [currentDate, maxDate, minDate]
+    [effectiveDate, maxDate, minDate]
   );
   const minutes = useMemo(
     () =>
       createNumberList(
-        ...getTimeRange(currentDate, minDate, maxDate, 'minute'),
+        ...getTimeRange(effectiveDate, minDate, maxDate, 'minute'),
         0
       ),
-    [currentDate, maxDate, minDate]
+    [effectiveDate, maxDate, minDate]
   );
   const seconds = useMemo(
     () =>
       createNumberList(
-        ...getTimeRange(currentDate, minDate, maxDate, 'second'),
+        ...getTimeRange(effectiveDate, minDate, maxDate, 'second'),
         0
       ),
-    [currentDate, maxDate, minDate]
+    [effectiveDate, maxDate, minDate]
   );
 
   const handleChangeDate = useCallback(
-    (value: number, type: 'date' | 'hour' | 'minute' | 'second') => {
-      const { date: latestDate, currentDate: latestCurrentDate } =
-        latestValues.current;
-      const newDate = getDate(latestDate || latestCurrentDate)[type](value);
-      onSelectDate(getFormatted(newDate));
-    },
-    [onSelectDate]
+    (value: number, type: 'date' | 'hour' | 'minute' | 'second') =>
+      onSelectDatePart(type, value),
+    [onSelectDatePart]
   );
 
   const renderItem = () => {
@@ -115,7 +112,7 @@ const WheelSelector: React.FC<WheelSelectorProps> = ({ type }) => {
       return (
         <Wheel
           key="day"
-          value={getDate(currentDate).date()}
+          value={effectiveDate.date()}
           items={days}
           onChange={(value) => handleChangeDate(value, 'date')}
         />
@@ -149,10 +146,6 @@ const WheelSelector: React.FC<WheelSelectorProps> = ({ type }) => {
       );
     return null;
   };
-
-  useEffect(() => {
-    latestValues.current = { date, currentDate };
-  }, [date, currentDate]);
 
   return (
     <View style={styles.wheelContainer} key={'date-' + type}>

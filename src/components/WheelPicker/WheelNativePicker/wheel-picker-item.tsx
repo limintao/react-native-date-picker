@@ -1,131 +1,127 @@
 import { memo, useMemo } from 'react';
-import { Animated, Text, StyleSheet } from 'react-native';
+import { Animated, Text, View, StyleSheet } from 'react-native';
 import { useCalendarContext } from '../../../CalendarContext';
-import { PickerOption } from '../../../types';
+import type { PickerOption } from '../../../types';
 
 interface ItemProps {
   option: PickerOption | null;
   height: number;
   index: number;
-  currentScrollIndex: Animated.AnimatedAddition<number>;
+  currentScrollIndex: Animated.AnimatedDivision<number>;
   visibleRest: number;
-  rotationFunction: (x: number) => number;
-  opacityFunction: (x: number) => number;
-  scaleFunction: (x: number) => number;
+  rotationFunction: (distance: number) => number;
+  opacityFunction: (distance: number) => number;
+  scaleFunction: (distance: number) => number;
 }
-
+const finite = (n: number, fallback: number) =>
+  Number.isFinite(n) ? n : fallback;
 const WheelPickerItem: React.FC<ItemProps> = ({
-  height,
   option,
+  height,
   index,
-  visibleRest,
   currentScrollIndex,
-  opacityFunction,
+  visibleRest,
   rotationFunction,
+  opacityFunction,
   scaleFunction,
 }) => {
   const { theme } = useCalendarContext();
-  const relativeScrollIndex = useMemo(
+  const relative = useMemo(
     () => Animated.subtract(index, currentScrollIndex),
     [index, currentScrollIndex]
   );
-
-  const interpolInputRange = useMemo(() => {
-    const range = [0];
-    for (let i = 1; i <= visibleRest + 1; i++) {
-      range.unshift(-i);
-      range.push(i);
-    }
-    return range;
-  }, [visibleRest]);
-
-  const translateYOutputRange = useMemo(() => {
-    const range = [0];
-    for (let i = 1; i <= visibleRest + 1; i++) {
-      let y = (height / 2) * (1 - Math.sin(Math.PI / 2 - rotationFunction(i)));
-      for (let j = 1; j < i; j++) {
-        y += height * (1 - Math.sin(Math.PI / 2 - rotationFunction(j)));
-      }
-      range.unshift(y);
-      range.push(-y);
-    }
-    return range;
-  }, [height, visibleRest, rotationFunction]);
-
-  const opacityOutputRange = useMemo(() => {
-    const range = [1];
-    for (let x = 1; x <= visibleRest + 1; x++) {
-      const val = opacityFunction(x);
-      range.unshift(val);
-      range.push(val);
-    }
-    return range;
-  }, [visibleRest, opacityFunction]);
-
-  const scaleOutputRange = useMemo(() => {
-    const range = [1];
-    for (let x = 1; x <= visibleRest + 1; x++) {
-      const val = scaleFunction(x);
-      range.unshift(val);
-      range.push(val);
-    }
-    return range;
-  }, [visibleRest, scaleFunction]);
-
-  const rotateXOutputRange = useMemo(() => {
-    const range = ['0deg'];
-    for (let x = 1; x <= visibleRest + 1; x++) {
-      const deg = `${rotationFunction(x)}deg`;
-      range.unshift(deg);
-      range.push(deg);
-    }
-    return range;
-  }, [visibleRest, rotationFunction]);
-
-  const translateY = relativeScrollIndex.interpolate({
-    inputRange: interpolInputRange,
-    outputRange: translateYOutputRange,
-  });
-
-  const opacity = relativeScrollIndex.interpolate({
-    inputRange: interpolInputRange,
-    outputRange: opacityOutputRange,
-  });
-
-  const scale = relativeScrollIndex.interpolate({
-    inputRange: interpolInputRange,
-    outputRange: scaleOutputRange,
-  });
-
-  const rotateX = relativeScrollIndex.interpolate({
-    inputRange: interpolInputRange,
-    outputRange: rotateXOutputRange,
-  });
-
+  const animatedStyle = useMemo(() => {
+    const limit = visibleRest + 1;
+    const input = Array.from({ length: limit * 2 + 1 }, (_, i) => i - limit);
+    const angles = Array.from({ length: limit + 1 }, (_, i) =>
+      i === 0
+        ? 0
+        : Math.max(
+            0,
+            Math.min(Math.PI / 2 - 0.01, finite(rotationFunction(i), 0))
+          )
+    );
+    const translations = angles.map((angle, i) => {
+      let compression = (height / 2) * (1 - Math.cos(angle));
+      for (let j = 1; j < i; j++)
+        compression += height * (1 - Math.cos(angles[j]!));
+      return compression;
+    });
+    const interpolate = (outputRange: number[]) =>
+      relative.interpolate({
+        inputRange: input,
+        outputRange,
+        extrapolate: 'clamp',
+      });
+    const translateY = interpolate(
+      input.map((x) => -Math.sign(x) * translations[Math.abs(x)]!)
+    );
+    const opacity = interpolate(
+      input.map((x) =>
+        Math.abs(x) === limit
+          ? 0
+          : x === 0
+            ? 1
+            : Math.max(0, Math.min(1, finite(opacityFunction(Math.abs(x)), 0)))
+      )
+    );
+    const scale = interpolate(
+      input.map((x) =>
+        x === 0 ? 1 : Math.max(0.01, finite(scaleFunction(Math.abs(x)), 1))
+      )
+    );
+    const rotateX = relative.interpolate({
+      inputRange: input,
+      outputRange: input.map(
+        (x) => `${(-Math.sign(x) * angles[Math.abs(x)]! * 180) / Math.PI}deg`
+      ),
+      extrapolate: 'clamp',
+    });
+    return {
+      opacity,
+      transform: [
+        { perspective: 1000 },
+        { translateY },
+        { rotateX },
+        { scale },
+      ],
+    };
+  }, [
+    height,
+    visibleRest,
+    relative,
+    rotationFunction,
+    opacityFunction,
+    scaleFunction,
+  ]);
   return (
-    <Animated.View
-      style={[
-        styles.option,
-        {
-          height,
-          opacity,
-          transform: [{ translateY }, { rotateX }, { scale }],
-        },
-        theme.wheelPickerItemStyle,
-      ]}
-    >
-      <Text style={theme.wheelPickerTextStyle}>{option?.text}</Text>
-    </Animated.View>
+    <View style={{ height, flexShrink: 0 }}>
+      <Animated.View
+        style={[
+          styles.option,
+          theme.wheelPickerItemStyle,
+          {
+            height,
+            minHeight: height,
+            maxHeight: height,
+            marginVertical: 0,
+            flexShrink: 0,
+          },
+          animatedStyle,
+        ]}
+      >
+        <Text numberOfLines={1} style={theme.wheelPickerTextStyle}>
+          {option?.text}
+        </Text>
+      </Animated.View>
+    </View>
   );
 };
-
 const styles = StyleSheet.create({
   option: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 10,
-    zIndex: 100,
   },
 });
-
 export default memo(WheelPickerItem);

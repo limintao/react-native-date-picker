@@ -29,9 +29,9 @@ const Header: React.FC<HeaderProps> = ({ buttonPrevIcon, buttonNextIcon }) => {
         calendarView === 'day'
           ? onChangeMonth(-1)
           : calendarView === 'month'
-          ? onChangeYear(currentYear - 1)
-          : calendarView === 'year' &&
-            onChangeYear(currentYear - YEAR_PAGE_SIZE)
+            ? onChangeYear(currentYear - 1)
+            : calendarView === 'year' &&
+              onChangeYear(currentYear - YEAR_PAGE_SIZE)
       }
       accessibilityRole="button"
       accessibilityLabel="Prev"
@@ -63,9 +63,9 @@ const Header: React.FC<HeaderProps> = ({ buttonPrevIcon, buttonNextIcon }) => {
         calendarView === 'day'
           ? onChangeMonth(1)
           : calendarView === 'month'
-          ? onChangeYear(currentYear + 1)
-          : calendarView === 'year' &&
-            onChangeYear(currentYear + YEAR_PAGE_SIZE)
+            ? onChangeYear(currentYear + 1)
+            : calendarView === 'year' &&
+              onChangeYear(currentYear + YEAR_PAGE_SIZE)
       }
       accessibilityRole="button"
       accessibilityLabel="Next"

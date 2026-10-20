@@ -12,7 +12,12 @@ import localeData from 'dayjs/plugin/localeData';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import 'dayjs/locale/zh-cn';
-import { getEndOfDay, getStartOfDay, areDatesOnSameDay } from './utils';
+import {
+  getEndOfDay,
+  getStartOfDay,
+  areDatesOnSameDay,
+  clampDate,
+} from './utils';
 import CalendarContext from './CalendarContext';
 import { CalendarViews, CalendarActionKind } from './enums';
 import type {
@@ -34,10 +39,10 @@ dayjs.extend(localeData);
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
 
+type DatePickerCommonProps = Omit<DatePickerBaseProps, 'mode' | 'onChange'>;
+
 export interface DatePickerSingleProps
-  extends CalendarThemeProps,
-    HeaderProps,
-    DatePickerBaseProps {
+  extends CalendarThemeProps, HeaderProps, DatePickerCommonProps {
   mode: 'single';
   columns?: never;
   date?: DateType;
@@ -45,9 +50,7 @@ export interface DatePickerSingleProps
 }
 
 export interface DatePickerRangeProps
-  extends CalendarThemeProps,
-    HeaderProps,
-    DatePickerBaseProps {
+  extends CalendarThemeProps, HeaderProps, DatePickerCommonProps {
   mode: 'range';
   columns?: never;
   startDate?: DateType;
@@ -56,9 +59,7 @@ export interface DatePickerRangeProps
 }
 
 export interface DatePickerMultipleProps
-  extends CalendarThemeProps,
-    HeaderProps,
-    DatePickerBaseProps {
+  extends CalendarThemeProps, HeaderProps, DatePickerCommonProps {
   mode: 'multiple';
   columns?: never;
   dates?: DateType[];
@@ -66,9 +67,7 @@ export interface DatePickerMultipleProps
 }
 
 export interface DatePickerWheelProps
-  extends CalendarThemeProps,
-    HeaderProps,
-    DatePickerBaseProps {
+  extends CalendarThemeProps, HeaderProps, DatePickerCommonProps {
   mode: 'wheel';
   date?: DateType;
   onChange?: SingleChange;
@@ -88,8 +87,8 @@ const DateTimePicker: React.FC<
     firstDayOfWeek,
     buttonPrevIcon,
     buttonNextIcon,
-    minDate,
-    maxDate,
+    minDate: suppliedMinDate,
+    maxDate: suppliedMaxDate,
     date,
     startDate,
     endDate,
@@ -102,6 +101,14 @@ const DateTimePicker: React.FC<
     columns = ['year', 'month', 'day'],
     ...rest
   } = props;
+  const minDate =
+    mode === 'wheel'
+      ? (suppliedMinDate ?? '1900-01-01 00:00:00')
+      : suppliedMinDate;
+  const maxDate =
+    mode === 'wheel'
+      ? (suppliedMaxDate ?? '2099-12-31 23:59:59.999')
+      : suppliedMaxDate;
   dayjs.locale(locale);
 
   const initialCalendarView: CalendarViews = useMemo(
@@ -120,11 +127,11 @@ const DateTimePicker: React.FC<
   const initialState: LocalState = useMemo(() => {
     let initialDate = dayjs();
 
-    if (mode === 'single' && date) {
+    if ((mode === 'single' || mode === 'wheel') && date != null) {
       initialDate = dayjs(date);
     }
 
-    if (mode === 'range' && startDate) {
+    if (mode === 'range' && startDate != null) {
       initialDate = dayjs(startDate);
     }
 
@@ -132,37 +139,35 @@ const DateTimePicker: React.FC<
       initialDate = dayjs(dates[0]);
     }
 
-    if (minDate && initialDate.isBefore(minDate)) {
-      initialDate = dayjs(minDate);
-    }
+    initialDate = clampDate(initialDate, minDate, maxDate);
 
-    let _date = (date ? dayjs(date) : date) as DateType;
+    let _date = (date != null ? dayjs(date) : date) as DateType;
 
-    if (_date && maxDate && dayjs(_date).isAfter(maxDate)) {
+    if (_date != null && maxDate != null && dayjs(_date).isAfter(maxDate)) {
       _date = dayjs(maxDate);
     }
 
-    if (_date && minDate && dayjs(_date).isBefore(minDate)) {
+    if (_date != null && minDate != null && dayjs(_date).isBefore(minDate)) {
       _date = dayjs(minDate);
     }
 
-    let start = (startDate ? dayjs(startDate) : startDate) as DateType;
+    let start = (startDate != null ? dayjs(startDate) : startDate) as DateType;
 
-    if (start && maxDate && dayjs(start).isAfter(maxDate)) {
+    if (start != null && maxDate != null && dayjs(start).isAfter(maxDate)) {
       start = dayjs(maxDate);
     }
 
-    if (start && minDate && dayjs(start).isBefore(minDate)) {
+    if (start != null && minDate != null && dayjs(start).isBefore(minDate)) {
       start = dayjs(minDate);
     }
 
-    let end = (endDate ? dayjs(endDate) : endDate) as DateType;
+    let end = (endDate != null ? dayjs(endDate) : endDate) as DateType;
 
-    if (end && maxDate && dayjs(end).isAfter(maxDate)) {
+    if (end != null && maxDate != null && dayjs(end).isAfter(maxDate)) {
       end = dayjs(maxDate);
     }
 
-    if (end && minDate && dayjs(end).isBefore(minDate)) {
+    if (end != null && minDate != null && dayjs(end).isBefore(minDate)) {
       end = dayjs(minDate);
     }
 
@@ -209,7 +214,7 @@ const DateTimePicker: React.FC<
           return {
             ...prevState,
             date: selectDate,
-            currentDate: selectDate,
+            currentDate: selectDate ?? prevState.currentDate,
           };
         case CalendarActionKind.CHANGE_SELECTED_RANGE:
           const { startDate: start, endDate: end } = action.payload;
@@ -236,12 +241,27 @@ const DateTimePicker: React.FC<
 
   useEffect(() => {
     if (mode === 'single') {
-      let newDate = (date && (timePicker ? date : getStartOfDay(date))) ?? date;
+      let newDate =
+        date == null
+          ? date
+          : clampDate(
+              timePicker ? date : getStartOfDay(date),
+              minDate,
+              maxDate
+            );
 
-      if (newDate && maxDate && dayjs(newDate).isAfter(maxDate)) {
+      if (
+        newDate != null &&
+        maxDate != null &&
+        dayjs(newDate).isAfter(maxDate)
+      ) {
         newDate = dayjs(maxDate);
       }
-      if (newDate && minDate && dayjs(newDate).isBefore(minDate)) {
+      if (
+        newDate != null &&
+        minDate != null &&
+        dayjs(newDate).isBefore(minDate)
+      ) {
         newDate = dayjs(minDate);
       }
 
@@ -250,21 +270,21 @@ const DateTimePicker: React.FC<
         payload: { date: newDate },
       });
     } else if (mode === 'range') {
-      let start = startDate ? dayjs(startDate) : startDate;
+      let start = startDate != null ? dayjs(startDate) : startDate;
 
-      if (start && maxDate && dayjs(start).isAfter(maxDate)) {
+      if (start != null && maxDate != null && dayjs(start).isAfter(maxDate)) {
         start = dayjs(maxDate);
       }
-      if (start && minDate && dayjs(start).isBefore(minDate)) {
+      if (start != null && minDate != null && dayjs(start).isBefore(minDate)) {
         start = dayjs(minDate);
       }
 
-      let end = endDate ? dayjs(endDate) : endDate;
+      let end = endDate != null ? dayjs(endDate) : endDate;
 
-      if (end && maxDate && dayjs(end).isAfter(maxDate)) {
+      if (end != null && maxDate != null && dayjs(end).isAfter(maxDate)) {
         end = dayjs(maxDate);
       }
-      if (end && minDate && dayjs(end).isBefore(minDate)) {
+      if (end != null && minDate != null && dayjs(end).isBefore(minDate)) {
         end = dayjs(minDate);
       }
       dispatch({
@@ -282,7 +302,13 @@ const DateTimePicker: React.FC<
     else if (mode === 'wheel')
       dispatch({
         type: CalendarActionKind.CHANGE_SELECTED_DATE,
-        payload: { date },
+        payload: {
+          date: clampDate(
+            date ?? stateRef.current.currentDate,
+            minDate,
+            maxDate
+          ),
+        },
       });
   }, [mode, date, startDate, endDate, dates, minDate, timePicker, maxDate]);
 
@@ -290,25 +316,41 @@ const DateTimePicker: React.FC<
     dispatch({ type: CalendarActionKind.SET_CALENDAR_VIEW, payload: view });
   }, []);
 
+  const commitSingleDate = useCallback(
+    (datetime: DateType) => {
+      const next = clampDate(datetime, minDate, maxDate);
+      // Update the event-time snapshot before another column can commit.
+      stateRef.current = { ...stateRef.current, date: next, currentDate: next };
+      dispatch({
+        type: CalendarActionKind.CHANGE_SELECTED_DATE,
+        payload: { date: next },
+      });
+      if (mode === 'single' || mode === 'wheel')
+        (onChange as SingleChange)?.({ mode, date: next.format(format) });
+    },
+    [minDate, maxDate, mode, onChange, format]
+  );
+
+  const onSelectDatePart = useCallback(
+    (part: 'date' | 'hour' | 'minute' | 'second', value: number) => {
+      commitSingleDate(dayjs(stateRef.current.currentDate)[part](value));
+    },
+    [commitSingleDate]
+  );
+
   const onSelectDate = useCallback(
     (datetime: DateType) => {
       if (mode === 'single') {
         const newDate = timePicker ? datetime : getStartOfDay(datetime);
 
-        dispatch({
-          type: CalendarActionKind.CHANGE_CURRENT_DATE,
-          payload: newDate,
-        });
-
-        (onChange as SingleChange)?.({
-          date: dayjs(newDate).format(format),
-        });
+        commitSingleDate(newDate);
       } else if (mode === 'range') {
         const sd = stateRef.current.startDate;
         const ed = stateRef.current.endDate;
         const newDate = dayjs(datetime);
 
         let newDateRang: Parameters<RangeChange>[0] = {
+          mode,
           startDate: getStartOfDay(sd || newDate).format(format),
           endDate: ed ? getEndOfDay(ed).format(format) : undefined,
         };
@@ -343,6 +385,7 @@ const DateTimePicker: React.FC<
         newDates.sort((a, b) => (dayjs(a).isAfter(dayjs(b)) ? 1 : -1));
 
         const newDatesObj = {
+          mode,
           dates: newDates.map((d) => dayjs(d).format(format)),
           datePressed: newDate.format(format),
           change: (exists
@@ -357,49 +400,50 @@ const DateTimePicker: React.FC<
 
         (onChange as MultiChange)?.(newDatesObj);
       } else if (mode === 'wheel') {
-        dispatch({
-          type: CalendarActionKind.CHANGE_CURRENT_DATE,
-          payload: datetime,
-        });
-
-        (onChange as SingleChange)?.({
-          date: dayjs(datetime).format(format),
-        });
+        commitSingleDate(datetime);
       }
     },
-    [format, mode, timePicker, onChange]
+    [format, mode, timePicker, onChange, commitSingleDate]
   );
 
   const onSelectMonth = useCallback(
     (month: number) => {
-      let newDate = dayjs(stateRef.current.currentDate).month(month);
-      if (maxDate && newDate.isAfter(maxDate)) newDate = dayjs(maxDate);
-      if (minDate && newDate.isBefore(minDate)) newDate = dayjs(minDate);
-      dispatch({
-        type: CalendarActionKind.CHANGE_CURRENT_DATE,
-        payload: newDate,
-      });
+      const next = clampDate(
+        dayjs(stateRef.current.currentDate).month(month),
+        minDate,
+        maxDate
+      );
+      if (mode === 'single' || mode === 'wheel') commitSingleDate(next);
+      else {
+        stateRef.current = { ...stateRef.current, currentDate: next };
+        dispatch({
+          type: CalendarActionKind.CHANGE_CURRENT_DATE,
+          payload: next,
+        });
+      }
       if (mode !== 'wheel') setCalendarView('day');
-      if (mode === 'single' || mode === 'wheel')
-        (onChange as SingleChange)?.({ date: newDate.format(format) });
     },
-    [format, maxDate, minDate, mode, onChange, setCalendarView]
+    [minDate, maxDate, mode, commitSingleDate, setCalendarView]
   );
 
   const onSelectYear = useCallback(
     (year: number) => {
-      let newDate = dayjs(stateRef.current.currentDate).year(year);
-      if (maxDate && newDate.isAfter(maxDate)) newDate = dayjs(maxDate);
-      if (minDate && newDate.isBefore(minDate)) newDate = dayjs(minDate);
-      dispatch({
-        type: CalendarActionKind.CHANGE_CURRENT_DATE,
-        payload: newDate,
-      });
+      const next = clampDate(
+        dayjs(stateRef.current.currentDate).year(year),
+        minDate,
+        maxDate
+      );
+      if (mode === 'single' || mode === 'wheel') commitSingleDate(next);
+      else {
+        stateRef.current = { ...stateRef.current, currentDate: next };
+        dispatch({
+          type: CalendarActionKind.CHANGE_CURRENT_DATE,
+          payload: next,
+        });
+      }
       if (mode !== 'wheel') setCalendarView('day');
-      if (mode === 'single' || mode === 'wheel')
-        (onChange as SingleChange)?.({ date: newDate.format(format) });
     },
-    [format, maxDate, minDate, mode, setCalendarView, onChange]
+    [minDate, maxDate, mode, commitSingleDate, setCalendarView]
   );
 
   const onChangeMonth = useCallback((month: number) => {
@@ -425,9 +469,6 @@ const DateTimePicker: React.FC<
       timePicker,
       minDate,
       maxDate,
-      startDate,
-      endDate,
-      dates,
       displayFullDays,
       firstDayOfWeek: firstDay,
       height,
@@ -440,9 +481,6 @@ const DateTimePicker: React.FC<
       timePicker,
       minDate,
       maxDate,
-      startDate,
-      endDate,
-      dates,
       displayFullDays,
       firstDay,
       height,
@@ -454,6 +492,7 @@ const DateTimePicker: React.FC<
     () => ({
       setCalendarView,
       onSelectDate,
+      onSelectDatePart,
       onSelectMonth,
       onSelectYear,
       onChangeMonth,
@@ -462,6 +501,7 @@ const DateTimePicker: React.FC<
     [
       setCalendarView,
       onSelectDate,
+      onSelectDatePart,
       onSelectMonth,
       onSelectYear,
       onChangeMonth,

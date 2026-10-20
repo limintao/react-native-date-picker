@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": "./",
     "paths": {
       "react": ["./node_modules/@types/react"],
       "react-native-dates-picker": ["./src/index"]
@@ -12,7 +11,7 @@
     "jsx": "react-jsx",
     "lib": ["esnext"],
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "noImplicitUseStrict": false,

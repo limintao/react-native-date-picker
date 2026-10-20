@@ -72,12 +72,12 @@ const Day: React.FC<Props> = ({
   const textStyle = isSelected
     ? { color: '#fff', ...selectedTextStyle }
     : isToday
-    ? {
-        ...calendarTextStyle,
-        color: selectedItemColor,
-        ...todayTextStyle,
-      }
-    : calendarTextStyle;
+      ? {
+          ...calendarTextStyle,
+          color: selectedItemColor,
+          ...todayTextStyle,
+        }
+      : calendarTextStyle;
 
   const rangeRootBackground =
     selectedRangeBackgroundColor ?? addColorAlpha(selectedItemColor!, 0.15);

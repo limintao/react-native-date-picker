@@ -16,6 +16,10 @@ export interface CalendarContextType extends DatePickerBaseProps {
   currentYear: number;
   setCalendarView: (value: CalendarViews) => void;
   onSelectDate: (date: DateType) => void;
+  onSelectDatePart: (
+    part: 'date' | 'hour' | 'minute' | 'second',
+    value: number
+  ) => void;
   onSelectMonth: (month: number) => void;
   onSelectYear: (year: number) => void;
   onChangeMonth: (value: number) => void;

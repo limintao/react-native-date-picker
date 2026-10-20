@@ -26,20 +26,20 @@ const YearSelector: React.FC = () => {
               backgroundColor: theme?.selectedItemColor || '#0047FF',
             }
           : year === activeYear
-          ? {
-              borderColor: theme?.selectedItemColor || '#0047FF',
-            }
-          : {};
+            ? {
+                borderColor: theme?.selectedItemColor || '#0047FF',
+              }
+            : {};
 
       const textStyle: TextStyle =
         year === selectedYear
           ? { color: '#fff', ...theme?.selectedTextStyle }
           : year === activeYear
-          ? {
-              color: theme?.selectedItemColor || '#0047FF',
-              fontWeight: 'bold',
-            }
-          : { ...theme?.calendarTextStyle };
+            ? {
+                color: theme?.selectedItemColor || '#0047FF',
+                fontWeight: 'bold',
+              }
+            : { ...theme?.calendarTextStyle };
 
       return (
         <Pressable

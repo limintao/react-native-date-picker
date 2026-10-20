@@ -31,7 +31,7 @@ const DaySelector: React.FC = () => {
     height,
   } = useCalendarContext();
 
-  const { year, month, hour, minute } = getParsedDate(currentDate);
+  const { year, month, hour, minute, second } = getParsedDate(currentDate);
 
   const daysGrid = useMemo(
     () => {
@@ -149,11 +149,11 @@ const DaySelector: React.FC = () => {
 
   const handleSelectDate = useCallback(
     (dateStr: string) => {
-      const newDate = getDate(dateStr).hour(hour).minute(minute);
+      const newDate = getDate(dateStr).hour(hour).minute(minute).second(second);
 
       onSelectDate(getFormatted(newDate));
     },
-    [onSelectDate, hour, minute]
+    [onSelectDate, hour, minute, second]
   );
 
   return (

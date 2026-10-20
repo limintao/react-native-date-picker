@@ -1,223 +1,272 @@
-import { useEffect, useMemo, useRef, useState, memo } from 'react';
 import {
-  NativeSyntheticEvent,
-  NativeScrollEvent,
+  memo,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+} from 'react';
+import {
   Animated,
-  View,
-  ViewProps,
-  FlatList,
   Platform,
+  ScrollView,
   StyleSheet,
+  View,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+  type ViewProps,
 } from 'react-native';
 import WheelPickerItem from './wheel-picker-item';
-import { PickerOption } from '../../../types';
+import type { PickerOption } from '../../../types';
 import { useCalendarContext } from '../../../CalendarContext';
 
 interface Props {
   value: number | string;
   options: PickerOption[];
-  onChange: (index: number | string) => void;
+  onChange: (value: number | string) => void;
   itemHeight?: number;
   containerProps?: Omit<ViewProps, 'style'>;
-  scaleFunction?: (x: number) => number;
-  rotationFunction?: (x: number) => number;
-  opacityFunction?: (x: number) => number;
+  scaleFunction?: (distance: number) => number;
+  /** Angle in radians. */
+  rotationFunction?: (distance: number) => number;
+  opacityFunction?: (distance: number) => number;
   visibleRest?: number;
   decelerationRate?: 'normal' | 'fast' | number;
 }
+const defaultScale = () => 1;
+const defaultRotation = (x: number) => 1 - 2 ** -x;
+const defaultOpacity = (x: number) => 3 ** -x;
+type Phase = 'idle' | 'dragging' | 'released' | 'momentum';
+type ScrollEvent = NativeSyntheticEvent<NativeScrollEvent>;
+const QUIET_MS = 160;
 
 const WheelPicker: React.FC<Props> = ({
   value,
   options,
   onChange,
   itemHeight = 40,
-  scaleFunction = (x: number) => 1.0 ** x,
-  rotationFunction = (x: number) => 1 - Math.pow(1 / 2, x),
-  opacityFunction = (x: number) => Math.pow(1 / 3, x),
   visibleRest = 2,
+  scaleFunction = defaultScale,
+  rotationFunction = defaultRotation,
+  opacityFunction = defaultOpacity,
   decelerationRate = 'normal',
   containerProps = {},
 }) => {
-  const { theme } = useCalendarContext();
-  const momentumStarted = useRef(false);
-  const selectedIndex = options.findIndex((item) => item.value === value);
-
-  const flatListRef = useRef<FlatList>(null);
-  const [scrollY] = useState(new Animated.Value(selectedIndex * itemHeight));
-
-  const containerHeight = (1 + visibleRest * 2) * itemHeight;
-  const paddedOptions = useMemo(() => {
-    const array: (PickerOption | null)[] = [...options];
-    for (let i = 0; i < visibleRest; i++) {
-      array.unshift(null);
-      array.push(null);
-    }
-    return array;
-  }, [options, visibleRest]);
-
-  const offsets = useMemo(
-    () => [...Array(paddedOptions.length)].map((_, i) => i * itemHeight),
-    [paddedOptions, itemHeight]
-  );
-
-  const currentScrollIndex = useMemo(
-    () => Animated.add(Animated.divide(scrollY, itemHeight), visibleRest),
-    [visibleRest, scrollY, itemHeight]
-  );
-
-  const handleScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const offsetY = Math.min(
-      itemHeight * (options.length - 1),
-      Math.max(event.nativeEvent.contentOffset.y, 0)
+  if (
+    !Number.isFinite(itemHeight) ||
+    itemHeight <= 0 ||
+    !Number.isInteger(visibleRest) ||
+    visibleRest < 0
+  ) {
+    throw new Error(
+      'WheelPicker requires itemHeight > 0 and an integer visibleRest >= 0'
     );
-    let index = Math.floor(offsetY / itemHeight);
-    const remainder = offsetY % itemHeight;
-    if (remainder > itemHeight / 2) {
-      index++;
+  }
+  const { theme } = useCalendarContext();
+  const selectedIndex = Math.max(
+    0,
+    options.findIndex((item) => item.value === value)
+  );
+  const list = useRef<ScrollView>(null);
+  const initialOffset = useRef({ x: 0, y: selectedIndex * itemHeight }).current;
+  const scrollY = useRef(new Animated.Value(initialOffset.y)).current;
+  const offset = useRef(initialOffset.y);
+  const phase = useRef<Phase>('idle');
+  const epoch = useRef(0);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastNotified = useRef<number | string | undefined>(undefined);
+  const latest = useRef({ options, value, onChange, itemHeight });
+  latest.current = { options, value, onChange, itemHeight };
+  const valuesKey = JSON.stringify(
+    options.map((item) => [typeof item.value, item.value])
+  );
+  const previous = useRef({ valuesKey, itemHeight, visibleRest, value });
+
+  const clearTimer = useCallback(() => {
+    if (timer.current !== null) clearTimeout(timer.current);
+    timer.current = null;
+  }, []);
+  const moveTo = useCallback(
+    (y: number) => {
+      offset.current = y;
+      list.current?.scrollTo({ y, animated: false });
+      scrollY.setValue(y);
+    },
+    [scrollY]
+  );
+  const settle = useCallback(() => {
+    if (phase.current === 'idle' || phase.current === 'dragging') return;
+    clearTimer();
+    phase.current = 'idle';
+    const current = latest.current;
+    if (!current.options.length) return;
+    const index = Math.max(
+      0,
+      Math.min(
+        current.options.length - 1,
+        Math.round(offset.current / current.itemHeight)
+      )
+    );
+    const target = index * current.itemHeight;
+    if (Math.abs(offset.current - target) > 0.1) moveTo(target);
+    const next = current.options[index];
+    if (
+      next &&
+      next.value !== current.value &&
+      next.value !== lastNotified.current
+    ) {
+      lastNotified.current = next.value;
+      current.onChange(next.value);
     }
-    const value = options[index]?.value || 0;
-    if (index !== selectedIndex) {
-      onChange(value);
+  }, [clearTimer, moveTo]);
+  const scheduleSettle = useCallback(() => {
+    clearTimer();
+    const token = epoch.current;
+    timer.current = setTimeout(() => {
+      timer.current = null;
+      if (token === epoch.current) settle();
+    }, QUIET_MS);
+  }, [clearTimer, settle]);
+
+  useLayoutEffect(() => {
+    const old = previous.current;
+    const geometryChanged =
+      old.valuesKey !== valuesKey ||
+      old.itemHeight !== itemHeight ||
+      old.visibleRest !== visibleRest;
+    previous.current = { valuesKey, itemHeight, visibleRest, value };
+    // An acknowledgement of our own change must not interrupt the next gesture.
+    if (!geometryChanged && value === lastNotified.current) {
+      lastNotified.current = undefined;
+      return;
     }
-  };
+    clearTimer();
+    epoch.current += 1;
+    phase.current = 'idle';
+    lastNotified.current = undefined;
+    moveTo(selectedIndex * itemHeight);
+  }, [
+    value,
+    selectedIndex,
+    valuesKey,
+    itemHeight,
+    visibleRest,
+    clearTimer,
+    moveTo,
+  ]);
 
-  const handleMomentumScrollBegin = () => {
-    momentumStarted.current = true;
-  };
+  useEffect(
+    () => () => {
+      epoch.current += 1;
+      clearTimer();
+    },
+    [clearTimer]
+  );
 
-  const handleMomentumScrollEnd = (
-    event: NativeSyntheticEvent<NativeScrollEvent>
-  ) => {
-    momentumStarted.current = false;
-    handleScrollEnd(event);
-  };
-
-  const handleScrollEndDrag = (
-    event: NativeSyntheticEvent<NativeScrollEvent>
-  ) => {
-    // Capture the offset value immediately
-    const offsetY = event.nativeEvent.contentOffset?.y;
-
-    // We'll start a short timer to see if momentum scroll begins
-    setTimeout(() => {
-      // If momentum scroll hasn't started within the timeout,
-      // then it was a slow scroll that won't trigger momentum
-      if (!momentumStarted.current && offsetY !== undefined) {
-        // Create a synthetic event with just the data we need
-        const syntheticEvent = {
-          nativeEvent: {
-            contentOffset: { y: offsetY },
-          },
-        };
-        handleScrollEnd(syntheticEvent as any);
-      }
-    }, 50);
-  };
-
-  const scrollEvent = useMemo(
+  const onScroll = useMemo(
     () =>
       Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
-        useNativeDriver: true,
+        useNativeDriver: Platform.OS !== 'web',
+        listener: (event: ScrollEvent) => {
+          offset.current = event.nativeEvent.contentOffset.y;
+          if (phase.current === 'released' || phase.current === 'momentum')
+            scheduleSettle();
+        },
       }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [scrollY, scheduleSettle]
   );
-
-  useEffect(() => {
-    if (selectedIndex < 0 || selectedIndex >= options.length) {
-      throw new Error(
-        `Selected index ${selectedIndex} is out of bounds [0, ${
-          options.length - 1
-        }]`
-      );
-    }
-  }, [selectedIndex, options]);
-
-  /**
-   * If selectedIndex is changed from outside (not via onChange) we need to scroll to the specified index.
-   * This ensures that what the user sees as selected in the picker always corresponds to the value state.
-   */
-  useEffect(() => {
-    flatListRef.current?.scrollToIndex({
-      index: selectedIndex,
-      animated: Platform.OS === 'ios',
-    });
-  }, [selectedIndex, itemHeight]);
+  const currentScrollIndex = useMemo(
+    () => Animated.divide(scrollY, itemHeight),
+    [scrollY, itemHeight]
+  );
+  const containerHeight = (visibleRest * 2 + 1) * itemHeight;
 
   return (
     <View
+      {...containerProps}
       style={[
         styles.container,
-        { height: containerHeight },
         theme.wheelPickerContainerStyle,
+        { height: containerHeight },
       ]}
-      {...containerProps}
     >
       <View
+        pointerEvents="none"
         style={[
-          styles.selectedIndicator,
-          {
-            transform: [{ translateY: -itemHeight / 2 }],
-            height: itemHeight,
-          },
+          styles.indicator,
           theme.wheelPickerSelectedIndicatorStyle,
+          { height: itemHeight, top: visibleRest * itemHeight },
         ]}
       />
-      <Animated.FlatList
-        ref={flatListRef}
+      <Animated.ScrollView
+        ref={list}
+        style={styles.scroll}
+        contentContainerStyle={{ paddingVertical: visibleRest * itemHeight }}
+        contentOffset={initialOffset}
+        scrollEnabled={options.length > 1}
         nestedScrollEnabled
-        style={styles.scrollView}
         showsVerticalScrollIndicator={false}
-        scrollEventThrottle={16}
-        onScroll={scrollEvent}
-        snapToOffsets={offsets}
-        onScrollEndDrag={handleScrollEndDrag}
-        onMomentumScrollBegin={handleMomentumScrollBegin}
-        onMomentumScrollEnd={handleMomentumScrollEnd}
+        bounces={false}
+        overScrollMode="never"
+        removeClippedSubviews={false}
+        automaticallyAdjustContentInsets={false}
+        contentInsetAdjustmentBehavior="never"
+        snapToInterval={itemHeight}
+        snapToAlignment="start"
         decelerationRate={decelerationRate}
-        initialScrollIndex={selectedIndex}
-        getItemLayout={(_, index) => ({
-          length: itemHeight,
-          offset: itemHeight * index,
-          index,
-        })}
-        maxToRenderPerBatch={20}
-        data={paddedOptions}
-        keyExtractor={(item, index) =>
-          item ? `${item.value}-${item.text}-${index}` : `-${index}`
-        }
-        renderItem={({ item: option, index }) => (
+        scrollEventThrottle={16}
+        onScroll={onScroll}
+        onLayout={() => {
+          if (phase.current === 'idle') moveTo(offset.current);
+        }}
+        onContentSizeChange={() => {
+          if (phase.current === 'idle') moveTo(offset.current);
+        }}
+        onScrollBeginDrag={() => {
+          clearTimer();
+          epoch.current += 1;
+          phase.current = 'dragging';
+          lastNotified.current = undefined;
+        }}
+        onScrollEndDrag={(event) => {
+          if (phase.current !== 'dragging') return;
+          offset.current = event.nativeEvent.contentOffset.y;
+          phase.current = 'released';
+          scheduleSettle();
+        }}
+        onMomentumScrollBegin={() => {
+          if (phase.current !== 'released') return;
+          clearTimer();
+          phase.current = 'momentum';
+          scheduleSettle();
+        }}
+        onMomentumScrollEnd={(event) => {
+          if (phase.current !== 'released' && phase.current !== 'momentum')
+            return;
+          offset.current = event.nativeEvent.contentOffset.y;
+          settle();
+        }}
+      >
+        {options.map((option, index) => (
           <WheelPickerItem
-            key={`option-${index}`}
-            index={index}
+            key={`${typeof option.value}:${String(option.value)}`}
             option={option}
+            index={index}
             height={itemHeight}
+            visibleRest={visibleRest}
             currentScrollIndex={currentScrollIndex}
             scaleFunction={scaleFunction}
             rotationFunction={rotationFunction}
             opacityFunction={opacityFunction}
-            visibleRest={visibleRest}
           />
-        )}
-      />
+        ))}
+      </Animated.ScrollView>
     </View>
   );
 };
-
 const styles = StyleSheet.create({
-  container: {
-    display: 'flex',
-    position: 'relative',
-  },
-  selectedIndicator: {
-    position: 'absolute',
-    width: '100%',
-    top: '50%',
-  },
-  scrollView: {
-    overflow: 'hidden',
-    flex: 1,
-  },
+  container: { position: 'relative', overflow: 'hidden' },
+  scroll: { flex: 1 },
+  indicator: { position: 'absolute', width: '100%' },
 });
-
 export default memo(WheelPicker);

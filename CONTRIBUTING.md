@@ -2,8 +2,6 @@
 
 Contributions are always welcome, no matter how large or small!
 
-We want this community to be friendly and respectful to each other. Please follow it in all your interactions with the project. Before contributing, please read the [code of conduct](./CODE_OF_CONDUCT.md).
-
 ## Development workflow
 
 To get started with the project, run `yarn` in the root directory to install the required dependencies for each package:
@@ -19,25 +17,7 @@ While developing, you can run the [example app](/example/) to test your changes.
 To start the packager:
 
 ```sh
-yarn example start
-```
-
-To run the example app on Android:
-
-```sh
-yarn example android
-```
-
-To run the example app on iOS:
-
-```sh
-yarn example ios
-```
-
-To run the example app on Web:
-
-```sh
-yarn example web
+yarn example
 ```
 
 Make sure your code passes TypeScript and ESLint. Run the following to verify:
@@ -52,7 +32,6 @@ To fix formatting errors, run the following:
 ```sh
 yarn lint --fix
 ```
-
 
 ### Commit message convention
 
@@ -70,7 +49,7 @@ Our pre-commit hooks verify that your commit message matches this format when co
 
 [ESLint](https://eslint.org/), [Prettier](https://prettier.io/), [TypeScript](https://www.typescriptlang.org/)
 
-We use [TypeScript](https://www.typescriptlang.org/) for type checking, [ESLint](https://eslint.org/) with [Prettier](https://prettier.io/) for linting and formatting the code, and [Jest](https://jestjs.io/) for testing.
+We use [TypeScript](https://www.typescriptlang.org/) for type checking, [ESLint](https://eslint.org/) with [Prettier](https://prettier.io/) for linting and formatting the code.
 
 Our pre-commit hooks verify that the linter and tests pass when committing.
 
@@ -81,7 +60,11 @@ We use [release-it](https://github.com/release-it/release-it) to make it easier 
 To publish new versions, run the following:
 
 ```sh
-yarn release
+yarn release:patch
+// or
+yarn release:minor
+// or
+yarn release:major
 ```
 
 ### Scripts
@@ -91,9 +74,7 @@ The `package.json` file contains various scripts for common tasks:
 - `yarn bootstrap`: setup project by installing all dependencies and pods.
 - `yarn typecheck`: type-check files with TypeScript.
 - `yarn lint`: lint files with ESLint.
-- `yarn example start`: start the Metro server for the example app.
-- `yarn example android`: run the example app on Android.
-- `yarn example ios`: run the example app on iOS.
+- `yarn example`: start the Metro server for the example app.
 
 ### Sending a pull request
 
